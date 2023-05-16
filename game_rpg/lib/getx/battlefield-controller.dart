@@ -4,9 +4,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:game_rpg/component/databaseSQLite/db-manager.dart';
+import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/getx/enemy-controller.dart';
 import 'package:game_rpg/getx/item-controller.dart';
+import 'package:game_rpg/getx/profile-controller.dart';
 import 'package:game_rpg/getx/special-dialog-controller.dart';
 import 'package:game_rpg/getx/question-controller.dart';
 import 'package:game_rpg/getx/shop-controller.dart';
@@ -58,14 +60,28 @@ class BattleFieldController extends GetxController{
   List<Buff> enemyAccBuff = [];
 
 
+  RxBool stage1Unlocked = true.obs;
+  RxBool stage2Unlocked = true.obs;
+  RxBool stage3Unlocked = false.obs;
+  RxBool stage4Unlocked = false.obs;
+
   bgSelector() {
-    int killCount = enemyDefeated.value;
-    if(killCount <= 10){
-      return imageBG.value = 'assets/images/background/field-bg.png';
-    }else if(killCount > 10 && killCount <= 20){
-      return imageBG.value = 'assets/images/background/field-bg.png';
+    if(storyRound.value <= 5){
+      imageBG.value = 'assets/images/background/field-bg.png';
+    }else if(storyRound.value > 5 && storyRound.value <= 10){
+      imageBG.value = 'assets/images/background/forest-bg.jpg';
     }else{
-      return imageBG.value = 'assets/images/background/field-bg.png';
+      imageBG.value = 'assets/images/background/forest-bg-2.jpg';
+    }
+  }
+
+  stageUnlock() {
+    if(storyRound.value == 5){
+      stage2Unlocked.value = true;
+    }else if(storyRound.value == 10){
+      stage3Unlocked.value = true;
+    }else if(storyRound.value == 15){
+      stage4Unlocked.value = true;
     }
   }
 
@@ -94,35 +110,19 @@ class BattleFieldController extends GetxController{
     showPlayerAnimation.value = false;
     QuestionController.to.answerCorrect.value = false;
     effectAnimation.value = '';
-    QuestionController.to.currentScore.value = 0;
-    ShopController.to.coinGetBattle.value = 0;
-    storyRound.value = 1;
-    ItemController.to.generateItem();
+    ProfileController.to.continueGameStatus.value = true;
+    QuestionController.to.showAnswer.value = false;
+    QuestionController.to.showAnimation.value = false;
+    giveUpgradePoint(round: storyRound.value);
+    // QuestionController.to.currentScore.value = 0;
+    // ShopController.to.coinGetBattle.value = 0;
+    // storyRound.value = 1;
+    // ItemController.to.generateItem();
     stageText.value = stageCountController(storyRound.value);
     scorePerQuestion.value = questionScoreController(storyRound.value);
-
-    //test item
-    // CharacterController.to.itemList.add(
-    //   Item(
-    //     id: 1, 
-    //     image: 'green-herb', 
-    //     itemName: 'Herbal Hijau', 
-    //     desc: 'Memulikan sebagian kecil HP. Dapat digunakan untuk dikombinasikan. Vanitas Vanitatum, et Omnia Vanitas. Aku gk tau mau kasih penjelasan apa lagi jadi gw asal-asalan. Meskipun bisa pake dummy text tapi gw males cari jadinya gini.', 
-    //     quantity: 1
-    //   ),
-    // );
-    // CharacterController.to.itemList.add(
-    //   Item(
-    //     id: 2, 
-    //     image: 'green-herb', 
-    //     itemName: 'Herbal Merah', 
-    //     desc: 'Memulikan sebagian besar HP. Dapat digunakan untuk dikombinasikan. Vanitas Vanitatum, et Omnia Vanitas. Aku gk tau mau kasih penjelasan apa lagi jadi gw asal-asalan. Meskipun bisa pake dummy text tapi gw males cari jadinya gini.', 
-    //     quantity: 3
-    //   ),
-    // );
   }
 
-  resetBattlegroundData() {
+  resetBattlegroundData({required int stage}) {
     playerAtkBuff.clear();
     playerDefBuff.clear();
     playerAccBuff.clear();
@@ -132,13 +132,25 @@ class BattleFieldController extends GetxController{
     enemyAccBuff.clear();
     enemySpdBuff.clear();
     itemShowUp.clear();
+    QuestionController.to.clearQuestionValue();
     CharacterController.to.itemList.clear();
     CharacterController.to.selectedItemID.value = '';
+    CharacterController.to.upgradePointOwned.value = 0;
+    CharacterController.to.upgradePointAvailable.value = 0;
+    EnemyController.to.burnOn.value = false;
+    EnemyController.to.poisonOn.value = false;
+    EnemyController.to.gasOn.value = false;
+    EnemyController.to.camouflageOn.value = false;
     enemyDefeated.value = 0;
     playerTurn.value = 1;
+    storyRound.value = stage;
     enemyActive.value = false;
     battleLog.clear();
     EnemyController.to.enemySpawner();
+    QuestionController.to.currentScore.value = 0;
+    ShopController.to.coinGetBattle.value = 0;
+    ItemController.to.lifeNecklaceOn.value = false;
+    ItemController.to.generateItem();
   }
 
   randomEnemyGenerator() async {
@@ -188,15 +200,28 @@ class BattleFieldController extends GetxController{
     }
   }
 
+  giveUpgradePoint({required int round}){
+    if(round == 5){
+      CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
+      CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+    }else if(round == 10){
+      CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
+      CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+    }else if(round == 15){
+      CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 15;
+      CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 15;
+    }
+  }
+
   stageCountController(int round) {
-    if(storyRound.value > 0 && storyRound.value <= 10){
+    if(storyRound.value > 0 && storyRound.value <= 5){
       return stageText.value = '1 - $round';
-    }else if (round > 10 && round <= 20){
-      return stageText.value = '2 - ${round - 10}';
-    }else if (round > 20 && round <= 30){
-      return stageText.value = '3 - ${round - 20}';
-    }else if (round > 30 && round <= 40){
-      return stageText.value = '4 - ${round - 30}';
+    }else if (round > 5 && round <= 10){
+      return stageText.value = '2 - ${round - 5}';
+    }else if (round > 10 && round <= 15){
+      return stageText.value = '3 - ${round - 10}';
+    }else if (round > 15 && round <= 20){
+      return stageText.value = '4 - ${round - 15}';
     }else {
       return stageText.value = 'Endless Mode';
     }
@@ -224,11 +249,13 @@ class BattleFieldController extends GetxController{
         turn.value = 'waiting';
         turnIcon.value = 'assets/icons/waiting-icon.svg';
         // randomEnemyGenerator();
-        if(storyRound.value <= 40){
-          EnemyController.to.enemySpawner();
-        }else{
-          randomEnemyGenerator();
-        }
+        EnemyController.to.enemySpawner();
+        stageUnlock();
+        bgSelector();
+        ItemController.to.smokeActive.value = false;
+        ItemController.to.freezeActive.value = false;
+        ItemController.to.burnActive.value = false;
+        giveUpgradePoint(round: storyRound.value);
         enemyActive.value = false;
         enemyDefeated.value++;
         playerTurn.value = 1;
@@ -246,8 +273,10 @@ class BattleFieldController extends GetxController{
       if(ItemController.to.lifeNecklaceOn.value){
         CharacterController.to.playerHealth.value = CharacterController.to.playerMaxHealth.value;
         ItemController.to.removeItemFromItemList(itemID: 9);
+        ItemController.to.lifeNecklaceOn.value = false;
         addBattleLog(message: 'Item Jimat Penyelamat telah digunakan!', type: 'USE ITEM');
       }else{
+        ProfileController.to.continueGameStatus.value = true;
         SpecialDialogController.to.showGameOverDialog();
       }
     }
@@ -268,7 +297,7 @@ class BattleFieldController extends GetxController{
     }
 
     for (var i = 0; i < noCritRate; i++) {
-      critChanceContainer.add('NORMAT HIT');
+      critChanceContainer.add('NORMAL HIT');
     }
 
     effectAnimation.value = 'assets/images/lottie/hit-effect.json';
@@ -285,17 +314,6 @@ class BattleFieldController extends GetxController{
       effectAnimation.value = 'assets/images/lottie/critical-hit-effect.json';
       dmg  = tempDmg * 2;
     }
-
-    if(defenderPassiveSkill != null){
-        for(var i = 0; i < defenderPassiveSkill.length; i++){
-          var passive = defenderPassiveSkill[i];
-          if(passive == 'Duri Tajam'){
-            int dmgReflected = dmg ~/ 2;
-            attackerHp.value = attackerHp.value + dmgReflected;
-            addBattleLog(attacker: defender, defender: attacker, message: 'terkena serangan pantulan sebesar $dmgReflected dari', type: 'ATK');
-          }
-        }
-      }
     
     hp.value = hp.value + dmg;
     
@@ -309,22 +327,49 @@ class BattleFieldController extends GetxController{
       hp.value = 0;
     }
 
-    print('Attacker: ${turn.value}');
+    debugPrint('Attacker: ${turn.value}');
+    //Attack Animation
     if(turn.value == 'player'){
       showEnemyAnimation.value = true;
+      if(critChanceContainer[critResult] == 'NORMAL HIT'){
+        AudioController.to.playNormalAtkBGM();
+      }else{
+        AudioController.to.playCriticalAtkBGM();
+      }
       Timer(const Duration(seconds: 1), (){
         showEnemyAnimation.value = false;
       });
     }else{
       showPlayerAnimation.value = true;
-      Timer(const Duration(seconds: 1), (){
+      CharacterController.to.playerHit.value = true;
+      if(critChanceContainer[critResult] == 'NORMAL HIT'){
+        AudioController.to.playNormalAtkBGM();
+      }else{
+        AudioController.to.playCriticalAtkBGM();
+      }
+      Timer(const Duration(milliseconds: 250), (){
         showPlayerAnimation.value = false;
+        CharacterController.to.playerHit.value = false;
       });
     }
 
     addBattleLog(attacker: attacker, defender: defender, message: 'terkena serangan sebesar $txtDmg dari', type: 'ATK');
     
     return hp;
+  }
+
+  countItemDMG({required int dmgDealt}) {
+    effectAnimation.value = 'assets/images/lottie/hit-effect.json';
+
+    EnemyController.to.enemyHealth.value = EnemyController.to.enemyHealth.value - dmgDealt;
+    if(EnemyController.to.enemyHealth.value < 0){
+      EnemyController.to.enemyHealth.value = 0;
+    }
+
+    showEnemyAnimation.value = true;
+    Timer(const Duration(seconds: 1), (){
+      showEnemyAnimation.value = false;
+    });
   }
 
   Future dodgeChance<String>({required int spd, required int acc, required String defender, required String attacker, List? defenderPassiveSkill}) async {
@@ -343,6 +388,9 @@ class BattleFieldController extends GetxController{
       if(!QuestionController.to.answerCorrect.value){
         hitRate = 1;
         missRate = 4;
+        if(countRate > 10){
+          hitRate++;
+        }
       }else if(countRate < 1){
         hitRate = 2;
         missRate = 3;
@@ -353,14 +401,9 @@ class BattleFieldController extends GetxController{
         hitRate = 4;
         missRate = 1;
       }
-      
-      if(defenderPassiveSkill!.isNotEmpty){
-        for(var i = 0; i < defenderPassiveSkill.length; i++){
-          var passive = defenderPassiveSkill[i];
-          if(passive == 'Terbang'){
-            missRate++;
-          }
-        }
+
+      if(EnemyController.to.camouflageOn.value){
+        missRate++;
       }
 
     }else{
@@ -376,6 +419,10 @@ class BattleFieldController extends GetxController{
       }else if(countRate > 15){
         hitRate = 4;
         missRate = 1;
+      }
+
+      if(ItemController.to.smokeActive.value){
+        missRate++;
       }
     }
 
@@ -491,8 +538,9 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          CharacterController.to.playerAtk.value = CharacterController.to.playerAtk.value - element.buffEffect;
           if(kDebugMode){
-            print(CharacterController.to.playerDef.value);
+            print(CharacterController.to.playerAtk.value);
             debugPrint('REMOVE BUFF');
             debugPrint(element.toString());
           }
@@ -537,6 +585,7 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          CharacterController.to.playerSpd.value = CharacterController.to.playerSpd.value - element.buffEffect;
           if(kDebugMode){
             print(CharacterController.to.playerDef.value);
             debugPrint('REMOVE BUFF');
@@ -559,6 +608,7 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          CharacterController.to.playerAcc.value = CharacterController.to.playerAcc.value - element.buffEffect;
           if(kDebugMode){
             print(CharacterController.to.playerDef.value);
             debugPrint('REMOVE BUFF');
@@ -583,8 +633,9 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          EnemyController.to.enemyAtk.value = EnemyController.to.enemyAtk.value - element.buffEffect;
           if(kDebugMode){
-            print(CharacterController.to.playerDef.value);
+            print(EnemyController.to.enemyAtk.value);
             debugPrint('REMOVE BUFF');
             debugPrint(element.toString());
           }
@@ -607,7 +658,7 @@ class BattleFieldController extends GetxController{
         if(element.buffDuration == element.currentDuration){
           EnemyController.to.enemyDef.value = EnemyController.to.enemyDef.value - element.buffEffect;
           if(kDebugMode){
-            print(CharacterController.to.playerDef.value);
+            print(EnemyController.to.enemyDef.value);
             debugPrint('REMOVE BUFF');
             debugPrint(element.toString());
           }
@@ -628,8 +679,9 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          EnemyController.to.enemySpd.value = EnemyController.to.enemySpd.value - element.buffEffect;
           if(kDebugMode){
-            print(CharacterController.to.playerDef.value);
+            print(EnemyController.to.enemySpd.value);
             debugPrint('REMOVE BUFF');
             debugPrint(element.toString());
           }
@@ -650,8 +702,9 @@ class BattleFieldController extends GetxController{
           print('Duration After: ${element.currentDuration}');
         }
         if(element.buffDuration == element.currentDuration){
+          EnemyController.to.enemyAcc.value = EnemyController.to.enemyAcc.value - element.buffEffect;
           if(kDebugMode){
-            print(CharacterController.to.playerDef.value);
+            print(EnemyController.to.enemyAcc.value);
             debugPrint('REMOVE BUFF');
             debugPrint(element.toString());
           }
@@ -672,10 +725,16 @@ class BattleFieldController extends GetxController{
       case 'DODGE':
         battleLog.add('$defender $message.');
         break;
+      case 'DEFEND':
+        battleLog.add('$defender $message');
+        break;
       case 'DEFEAT':
         battleLog.add('$attacker $message $defender.');
         break;
       case 'USE ITEM':
+        battleLog.add(message);
+        break;
+      case 'FREE':
         battleLog.add(message);
         break;
       default:

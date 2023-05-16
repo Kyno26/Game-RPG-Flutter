@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/model/basic_question.dart';
 import 'package:game_rpg/widgets/question-display/question-basic.dart';
 import 'package:get/get.dart';
+import 'package:quiver/async.dart';
 
 class QuestionController extends GetxController{
   static QuestionController get to => Get.find<QuestionController>();
@@ -22,6 +24,11 @@ class QuestionController extends GetxController{
   RxBool answerCorrect = false.obs;
 
   BasicQuestion? selectedQuestion;
+  RxString animation = ''.obs;
+  RxBool showAnimation = false.obs;
+
+  RxInt maxTime = 15.obs;
+  RxInt curTime = 15.obs;
 
   RxInt currentScore = 0.obs;
   RxBool newScore = false.obs;
@@ -37,14 +44,31 @@ class QuestionController extends GetxController{
     correctAnswer.value = '';
     selectedAnswer.value = '';
     showAnswer.value = false;
+    showAnimation.value = false;
+    maxTime.value = 15;
+    curTime.value = 15;
   }
 
   getQuestionFromDatabase() async {
     int min = 1;
-    int max = await DBManager.db.getCount(tableName: 'question');
+    List tableList = ['question_respiration', 'question_digestive', 'question_immune'];
+    String tableName = '';
+
+    if(BattleFieldController.to.storyRound.value <= 5){
+      tableName = 'question_respiration';
+    }else if(BattleFieldController.to.storyRound.value > 5 && BattleFieldController.to.storyRound.value <= 10){
+      tableName = 'question_digestive';
+    }else if(BattleFieldController.to.storyRound.value > 10 && BattleFieldController.to.storyRound.value <= 15){
+      tableName = 'question_immune';
+    }else{
+      var tableId = Random().nextInt(tableList.length);
+      tableName = tableList[tableId];
+    }
+    
+    int max = await DBManager.db.getCount(tableName: tableName);
 
     var questionID = Random().nextInt(max - min + 1) + min;
-    selectedQuestion = await DBManager.db.getQuestion(idQuestion: questionID);
+    selectedQuestion = await DBManager.db.getQuestion(idQuestion: questionID, tableName: tableName);
     
     question.value = selectedQuestion!.question;
     randomizeChoiceOption();
@@ -116,22 +140,45 @@ class QuestionController extends GetxController{
     );
   }
 
+  startTimer(){
+    CountdownTimer countdownTimer = CountdownTimer(
+      Duration(seconds: maxTime.value), 
+      const Duration(seconds: 1)
+    );
+    var sub = countdownTimer.listen((event) {
+      
+    });
+    sub.onData((duration) {
+      curTime.value = maxTime.value - duration.elapsed.inSeconds;
+    });
+    sub.onDone(() {
+      checkAnswer();
+      sub.cancel();
+    });
+  }
+
   checkAnswer<Bool>() {
     var answer = false;
     if(selectedAnswer == correctAnswer){
       answer = true;
       currentScore.value = currentScore.value + BattleFieldController.to.scorePerQuestion.value;
       answerCorrect.value = true;
+      animation.value = 'assets/images/lottie/correct-answer.json';
     }else{
       answer = false;
       answerCorrect.value = false;
+      animation.value = 'assets/images/lottie/wrong-answer.json';
     }
     print(answer);
     print('Current Score: ${currentScore.value}');
     showAnswer.value = true;
+    showAnimation.value = true;
 
     BattleFieldController.to.questionPhase.value = false;
     // clearQuestionValue();
+    Timer(const Duration(seconds: 1), (){
+      showAnimation.value = false;
+    });
     return answer;
   }
 }

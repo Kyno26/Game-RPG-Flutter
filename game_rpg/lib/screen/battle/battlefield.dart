@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/getx/enemy-controller.dart';
@@ -36,6 +38,8 @@ class _BattleFieldState extends State<BattleField> {
   late Image actionButton;
   late Image logBg;
 
+  final bgmPlayer = AssetsAudioPlayer.withId('BGM');
+
   bool startGame = false;
 
   @override
@@ -48,6 +52,19 @@ class _BattleFieldState extends State<BattleField> {
     logBg = Image.asset('assets/images/background/scroll-parchment.png');
     BattleFieldController.to.initializeSystem();
     super.initState();
+    
+    playBgm();
+  }
+
+  void playBgm() async {
+    await bgmPlayer.open(
+      Audio('assets/audio/battle-1-BGM.mp3'),
+      loopMode: LoopMode.single,
+      autoStart: true,
+      showNotification: false,
+      respectSilentMode: false,
+      volume: 0.5,
+    );
   }
 
   @override
@@ -67,12 +84,18 @@ class _BattleFieldState extends State<BattleField> {
 
   @override
   void dispose() {
+    Get.delete<SpecialDialogController>();
+    bgmPlayer.dispose();
+    // AudioController.to.bgmPlayer1.dispose();
+    AudioController.to.slashAtkBGM1.dispose();
+    AudioController.to.critSlashAtkBGM1.dispose();
     super.dispose();
   }
   
   @override
   Widget build(BuildContext context) {
-    Get.put(SpecialDialogController(context: context));
+    // Get.put(SpecialDialogController(context: context));
+    final SpecialDialogController specialDialogCtrl = Get.put(SpecialDialogController(context: context));
 
     return WillPopScope(
       onWillPop: () async {
@@ -109,14 +132,14 @@ class _BattleFieldState extends State<BattleField> {
 
   Widget mainContent(){
     if(!isScreenLoading){
-      return  Container(
+      return Obx(() => Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage(BattleFieldController.to.imageBG.value),
             fit: BoxFit.fill
-          )
+          ),
         ),
         child: Column(
           children: [
@@ -282,7 +305,7 @@ class _BattleFieldState extends State<BattleField> {
                 child: Column(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.45,
+                      width: (EnemyController.to.enemyPassive.value == 'normal') ? MediaQuery.of(context).size.width * 0.45 : MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.2,
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -381,25 +404,34 @@ class _BattleFieldState extends State<BattleField> {
                     ),
                     child: Column(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.width * 0.2,
-                          decoration: BoxDecoration(
-                            color: Colors.cyan.shade100,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1),
-                            image: DecorationImage(
-                              image: AssetImage(CharacterController.to.playerCharacterImage.value)
-                            )
-                          ),
-                          child: (BattleFieldController.to.showPlayerAnimation.value)
-                            ? SizedBox(
+                        Obx(() => Stack(
+                          children: [
+                            Container(
                               width: MediaQuery.of(context).size.width * 0.2,
                               height: MediaQuery.of(context).size.width * 0.2,
-                              child: Lottie.asset(BattleFieldController.to.effectAnimation.value, fit: BoxFit.fill),
+                              decoration: BoxDecoration(
+                                color: Colors.cyan.shade100,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black, width: 1),
+                                image: DecorationImage(
+                                  image: AssetImage(CharacterController.to.playerCharacterImage.value)
+                                )
+                              ),
+                            ),
+                            if(CharacterController.to.playerHit.value)
+                            Opacity(
+                              opacity: 0.7,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.width * 0.2,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle
+                                ),
+                              ),
                             )
-                            : null,
-                        ),
+                          ],
+                        )),
                         Obx(() => SizedBox(
                           // height: MediaQuery.of(context).size.width * 0.2,
                           child: Column(
@@ -497,8 +529,84 @@ class _BattleFieldState extends State<BattleField> {
                                 children: [
                                   ActionButton(
                                     title: 'Serang', 
-                                    onPress: (){
-                                      CharacterController.to.playerPhase(actionSelected: 'Attack');
+                                    onPress: () async {
+                                      if(!EnemyController.to.gasOn.value){
+                                        CharacterController.to.playerPhase(actionSelected: 'Attack');
+                                      }else{
+                                        var count = EnemyController.to.maxGasDuration.value - EnemyController.to.curGasDuration.value;
+                                        showDialog(
+                                          context: context,
+                                          builder: (context){
+                                            return Center(
+                                              child: Container(
+                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                height: MediaQuery.of(context).size.height * 0.25,
+                                                color: Colors.transparent,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(context).size.width * 0.7,
+                                                      height: MediaQuery.of(context).size.height * 0.125,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        color: Colors.white,
+                                                      ),
+                                                      child: Column(
+                                                        children: [
+                                                          Container(
+                                                            width: MediaQuery.of(context).size.width * 0.8,
+                                                            height: MediaQuery.of(context).size.height * 0.05,
+                                                            decoration: const BoxDecoration(
+                                                              color: darkYellowColor,
+                                                              // border: Border(bottom: BorderSide(color: plainBlackBackground, width: 1)),
+                                                              borderRadius: BorderRadius.only(
+                                                                topLeft: Radius.circular(8),
+                                                                topRight: Radius.circular(8)
+                                                              )
+                                                            ),
+                                                            child: Center(
+                                                              child: Text('Peringatan',
+                                                                style: Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline6!
+                                                                  .copyWith(
+                                                                    fontFamily: 'Scada',
+                                                                    fontSize: smallText,
+                                                                    fontWeight: FontWeight.w700,
+                                                                    color: Colors.white
+                                                                  ),
+                                                              ),
+                                                            )
+                                                          ),
+                                                          SizedBox(
+                                                            width: MediaQuery.of(context).size.width * 0.8,
+                                                            height: MediaQuery.of(context).size.height * 0.075,
+                                                            // color: Colors.yellow,
+                                                            child: Center(
+                                                              child: Text('Anda tidak dapat menyerang akibat dari status negatif selama $count giliran',
+                                                                textAlign: TextAlign.center,
+                                                                style: Theme.of(context)
+                                                                  .textTheme
+                                                                  .headline5!
+                                                                  .copyWith(
+                                                                    fontFamily: 'Scada',
+                                                                    fontSize: smallText,
+                                                                    fontWeight: FontWeight.w700,
+                                                                    color: Colors.black
+                                                                  ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      )
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        );
+                                      }
                                     }
                                   ),
                                   SizedBox(width: Spacing.mediumSpacing),
@@ -513,13 +621,13 @@ class _BattleFieldState extends State<BattleField> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  ActionButton(
-                                    title: 'Inventory', 
-                                    onPress: (){
-                                      //code
-                                    }
-                                  ),
-                                  SizedBox(width: Spacing.mediumSpacing),
+                                  // ActionButton(
+                                  //   title: 'Inventory', 
+                                  //   onPress: (){
+                                  //     //code
+                                  //   }
+                                  // ),
+                                  // SizedBox(width: Spacing.mediumSpacing),
                                   ActionButton(
                                     title: 'Item', 
                                     onPress: (){
@@ -560,7 +668,7 @@ class _BattleFieldState extends State<BattleField> {
             ),
           ],
         ),
-      );
+      ));
     }else{
       return Container(
         width: MediaQuery.of(context).size.width,

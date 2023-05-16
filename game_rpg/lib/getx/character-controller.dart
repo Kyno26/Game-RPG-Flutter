@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/enemy-controller.dart';
 import 'package:game_rpg/getx/item-controller.dart';
@@ -54,7 +55,27 @@ class CharacterController extends GetxController{
   RxInt playerAcc = 0.obs;
   RxInt playerCrit = 0.obs;
 
+  RxBool playerHit = false.obs;
+
   RxInt maxBagCapacity = 10.obs;
+  RxInt upgradePointAvailable = 10.obs;
+  RxInt upgradePointOwned = 10.obs;
+
+  RxInt basePlayerMaxHealth = 0.obs;
+  RxInt basePlayerHealth = 0.obs;
+  RxInt basePlayerAtk = 0.obs;
+  RxInt basePlayerDef = 0.obs;
+  RxInt basePlayerSpd = 0.obs;
+  RxInt basePlayerAcc = 0.obs;
+  RxInt basePlayerCrit = 0.obs;
+
+  RxInt curPlayerMaxHealth = 0.obs;
+  RxInt curPlayerHealth = 0.obs;
+  RxInt curPlayerAtk = 0.obs;
+  RxInt curPlayerDef = 0.obs;
+  RxInt curPlayerSpd = 0.obs;
+  RxInt curPlayerAcc = 0.obs;
+  RxInt curPlayerCrit = 0.obs;
 
   // List itemList = <Item>[].obs;
   List<Item> itemList = [];
@@ -112,6 +133,20 @@ class CharacterController extends GetxController{
     playerSpd.value = spd;
     playerAcc.value = acc;
     playerCrit.value = crit;
+
+    basePlayerMaxHealth.value = hp;
+    basePlayerAtk.value = atk;
+    basePlayerDef.value = def;
+    basePlayerSpd.value = spd;
+    basePlayerAcc.value = acc;
+    basePlayerCrit.value = crit;
+
+    curPlayerMaxHealth.value = hp;
+    curPlayerAtk.value = atk;
+    curPlayerDef.value = def;
+    curPlayerSpd.value = spd;
+    curPlayerAcc.value = acc;
+    curPlayerCrit.value = crit;
   }
 
   checkCharacterUnlockStatus<bool> ({required int characterId}) {
@@ -144,6 +179,35 @@ class CharacterController extends GetxController{
     }
   }
 
+  upgradePlayerStatus(){
+    var pointHp = curPlayerMaxHealth.value - basePlayerMaxHealth.value;
+    var pointAtk = curPlayerAtk.value - basePlayerAtk.value;
+    var pointDef = curPlayerDef.value - basePlayerDef.value;
+    var pointSpd = curPlayerSpd.value - basePlayerSpd.value;
+    var pointAcc = curPlayerAcc.value - basePlayerAcc.value;
+
+    try {
+      playerMaxHealth.value = playerMaxHealth.value + pointHp;
+      playerHealth.value = playerHealth.value + pointHp;
+      playerAtk.value = playerAtk.value + pointAtk;
+      playerDef.value = playerDef.value + pointDef;
+      playerSpd.value = playerSpd.value + pointSpd;
+      playerAcc.value = playerAcc.value + pointAcc;
+
+      basePlayerMaxHealth.value = curPlayerMaxHealth.value;
+      basePlayerAtk.value = curPlayerAtk.value;
+      basePlayerDef.value = curPlayerDef.value;
+      basePlayerSpd.value = curPlayerSpd.value;
+      basePlayerAcc.value = curPlayerAcc.value;
+
+      var pointUsed = pointHp + pointAtk + pointDef + pointSpd + pointAcc;
+      upgradePointOwned.value = upgradePointOwned.value - pointUsed;
+      upgradePointAvailable.value = upgradePointOwned.value;
+    } catch (e) {
+      debugPrint('Error: Upgrade Character Status');
+    }
+  }
+
 
   playerPhase({required String actionSelected, String? buffName}) async {
     if(BattleFieldController.to.turn.value == 'player'){
@@ -156,10 +220,12 @@ class CharacterController extends GetxController{
           var attRes = await BattleFieldController.to.dodgeChance(spd: EnemyController.to.enemySpd.value, acc: playerAcc.value, defender: EnemyController.to.enemyName.value, attacker: 'player', defenderPassiveSkill: EnemyController.to.enemyPassiveList);
           if(attRes == 'HIT'){
             BattleFieldController.to.countDmgReceived(atk: CharacterController.to.playerAtk.value, def: EnemyController.to.enemyDef.value, hp: EnemyController.to.enemyHealth, maxHp: EnemyController.to.enemyMaxHealth.value, critRate: playerCrit.value, attacker: playerName.value, defender: EnemyController.to.enemyName.value, attackerHp: playerHealth);
+            // AudioController.to.playNormalAtkBGM();
           }
           break;
         case 'Defend':
           BattleFieldController.to.addBuff(buff: buffName!, receiver: 'player');
+          BattleFieldController.to.addBattleLog(message: ' bertahan', type: 'DEFEND', defender: playerName.value);
           break;
         case 'Use Item':
           ItemController.to.useItem(itemID: selectedItemID.value);
@@ -167,6 +233,7 @@ class CharacterController extends GetxController{
         default:
       }
       BattleFieldController.to.removePlayerBuffEffect();
+      EnemyController.to.checkDebuff();
       BattleFieldController.to.turn.value = 'enemy';
       debugPrint('===== END OF PLAYER PHASE =====');
       Timer(const Duration(seconds: 2), (){

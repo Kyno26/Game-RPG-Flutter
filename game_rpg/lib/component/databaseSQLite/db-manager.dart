@@ -120,9 +120,9 @@ class DBManager {
     return Buff.fromMap(result.first);
   }
 
-  Future<BasicQuestion> getQuestion({required int idQuestion}) async {
+  Future<BasicQuestion> getQuestion({required int idQuestion, required String tableName}) async {
     final Database db = await openDB();
-    var result = await db.rawQuery('SELECT * FROM question WHERE id=?', [idQuestion]);
+    var result = await db.rawQuery('SELECT * FROM $tableName WHERE id=?', [idQuestion]);
     if (kDebugMode) {
       debugPrint('$result');
     }

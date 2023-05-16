@@ -21,6 +21,8 @@ class GetItemDialog extends StatefulWidget{
 
 class _GetItemDialogState extends State<GetItemDialog> {
 
+  bool failGetItem = false;
+
   @override
   void initState() {
     super.initState();
@@ -45,9 +47,9 @@ class _GetItemDialogState extends State<GetItemDialog> {
                   scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
                   separatorBuilder: (context, index) => SizedBox(width: Spacing.smallSpacing), 
-                  itemCount: BattleFieldController.to.itemShowUp.length,
+                  itemCount: ItemController.to.itemShowUp.length,
                   itemBuilder: (context, index) {
-                    Item item = BattleFieldController.to.itemShowUp[index];
+                    Item item = ItemController.to.itemShowUp[index];
                     return ItemBox2(
                       itemIcon: item.image, 
                       itemName: item.itemName, 
@@ -64,8 +66,10 @@ class _GetItemDialogState extends State<GetItemDialog> {
                 child: Obx(() => ElevatedButton(
                   onPressed: () {
                     if(CharacterController.to.selectedItemID.value != ''){
-                      if((ItemController.to.currentBagCapacity.value + ItemController.to.itemToGetWeight.value) > CharacterController.to.maxBagCapacity.value){
-                        //code
+                      if(ItemController.to.lifeNecklaceOn.value == true){
+                        setState(() {
+                          failGetItem = false;
+                        });
                       }else{
                         ItemController.to.addItem(itemID: int.parse(CharacterController.to.selectedItemID.value));
                         Navigator.pop(context);
@@ -97,17 +101,20 @@ class _GetItemDialogState extends State<GetItemDialog> {
               SizedBox(height: Spacing.mediumSpacing),
               const Divider(thickness: 2, color: Colors.white),
               SizedBox(height: Spacing.mediumSpacing),
-              Text('Kapasitas Tas: ${ItemController.to.currentBagCapacity} / ${CharacterController.to.maxBagCapacity}',
-                style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .copyWith(
-                    fontFamily: 'Scada',
-                    fontSize: smallText,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white70
-                  ),
-              )
+              if(failGetItem)
+                Center(
+                  child: Text('Hanya dapat memiliki satu jenis item ini',
+                    style: Theme.of(context)
+                      .textTheme
+                      .headline6!
+                      .copyWith(
+                        fontFamily: 'Scada',
+                        fontSize: smallText,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red
+                      ),
+                  )
+                ),
             ],
           )
         ),

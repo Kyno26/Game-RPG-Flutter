@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:game_rpg/component/databaseSQLite/db-manager.dart';
 import 'package:game_rpg/component/shared-preferences-data/user-data.dart';
+import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/shop-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:get/get.dart';
@@ -78,6 +79,8 @@ class ProfileController extends GetxController{
   loadingUserData() async {
     loadPhase.value = '2';
     loadMessage.value = 'Creating user data';
+    BattleFieldController.to.startBattle.value = false;
+    BattleFieldController.to.questionPhase.value = false;
     if(await checkUserDataExist() == false){
       if (kDebugMode) {
         debugPrint('===== CREATING DATA =====');

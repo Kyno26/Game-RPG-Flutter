@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
@@ -7,6 +9,8 @@ import 'package:game_rpg/component/ui-components/text-size.dart';
 import 'package:game_rpg/getx/question-controller.dart';
 import 'package:game_rpg/widgets/answer-button.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+import 'package:quiver/async.dart';
 
 class QuestionBasic extends StatefulWidget{
   const QuestionBasic({super.key, 
@@ -31,10 +35,42 @@ class _QuestionBasicState extends State<QuestionBasic> {
   
   String clicked = '0';
   bool showAnswer = false;
+  late StreamSubscription<CountdownTimer> sub;
 
   @override
   void initState() {
+    startTimer();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // QuestionController.to.clearQuestionValue();
+    QuestionController.to.showAnswer.value = false;
+    QuestionController.to.showAnimation.value = false;
+    sub.cancel();
+    super.dispose();
+  }
+
+  startTimer(){
+    CountdownTimer countdownTimer = CountdownTimer(
+      Duration(seconds: QuestionController.to.maxTime.value), 
+      const Duration(seconds: 1)
+    );
+    sub = countdownTimer.listen((event) {
+      
+    });
+    sub.onData((duration) {
+      QuestionController.to.curTime.value = 0;
+      QuestionController.to.curTime.value = QuestionController.to.maxTime.value - duration.elapsed.inSeconds;
+    });
+    sub.onDone(() {
+      QuestionController.to.checkAnswer();
+      setState(() {
+        showAnswer = true;
+        sub.cancel();
+      });
+    });
   }
 
   @override
@@ -57,18 +93,22 @@ class _QuestionBasicState extends State<QuestionBasic> {
                   fit: BoxFit.fill
                 )
               ),
-              child: Center(
-                child: Text(widget.question,
-                  style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(
-                      fontFamily: 'Scada',
-                      fontSize: smallText,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black
+              child: Stack(
+                children: [
+                  Center(
+                    child: Text(widget.question,
+                      style: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .copyWith(
+                          fontFamily: 'Scada',
+                          fontSize: smallText,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black
+                        ),
                     ),
-                ),
+                  ),
+                ],
               )
             ),
             SizedBox(height: Spacing.mediumSpacing),
@@ -140,13 +180,16 @@ class _QuestionBasicState extends State<QuestionBasic> {
                   if(QuestionController.to.selectedAnswer.value != ''){
                     if(!QuestionController.to.showAnswer.value){
                       QuestionController.to.checkAnswer();
+                      sub.pause();
                       setState(() {
                         showAnswer = true;
                       });
                     }else{
                       Navigator.pop(context);
-                      QuestionController.to.clearQuestionValue();
+                      // QuestionController.to.clearQuestionValue();
                     }
+                  }else if(QuestionController.to.showAnswer.value){
+                    Navigator.pop(context);
                   }
                 },
                 child: Container(
@@ -158,7 +201,7 @@ class _QuestionBasicState extends State<QuestionBasic> {
                     borderRadius: BorderRadius.circular(15)
                   ),
                   child: Center(
-                    child:  Obx(() => Text((!QuestionController.to.showAnswer.value) ? 'Lihat Jawaban' : 'Tutup',
+                    child:  Obx(() => Text((!QuestionController.to.showAnswer.value) ? 'Konfirmasi Jawaban' : 'Tutup',
                       style: Theme.of(context)
                         .textTheme
                         .headline6!
@@ -172,106 +215,79 @@ class _QuestionBasicState extends State<QuestionBasic> {
                   )
                 ),
               )
-            )
+            ),
+            SizedBox(height: Spacing.smallSpacing),
+            Obx(() => extraWidget())
           ],
         ),
       ),
     );
   }
 
-  Widget answerMenu() {
-    return Column(
-      children: [
-        BasicOptionButton(
-          textAnswer: widget.option1, 
-          onPressed: () {
-            setState(() {
-              clicked = '1';
-            });
-            QuestionController.to.selectedAnswer.value = widget.option1;
-          }, 
-          index: '1', 
-          selected: clicked
+  extraWidget(){
+    if(QuestionController.to.showAnswer.value == true){
+      return Obx(() => Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset(QuestionController.to.animation.value,
+              repeat: false,
+              width: MediaQuery.of(context).size.width * 0.25,
+              height: MediaQuery.of(context).size.width * 0.25,
+            ),
+            Text(QuestionController.to.answerCorrect.value ? 'JAWABAN BENAR' : 'JAWABAN SALAH',
+              style: Theme.of(context)
+                .textTheme
+                .headline5!
+                .copyWith(
+                  fontFamily: 'Scada',
+                  fontWeight: FontWeight.w600,
+                  fontSize: averageText,
+                  color: QuestionController.to.answerCorrect.value ? Colors.green.shade300 : Colors.red
+                ),
+            )
+          ],
+        )
+      ));
+    }else{
+      return Obx(() => Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.4,
+          padding: EdgeInsets.symmetric(vertical: Spacing.smallSpacing, horizontal: Spacing.mediumSpacing),
+          decoration: BoxDecoration(
+            color: Colors.brown.shade300,
+            border: Border.all(color: Colors.brown.shade600, width: 2),
+            borderRadius: BorderRadius.circular(5)
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Waktu: ',
+                style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(
+                    fontFamily: 'Scada',
+                    fontWeight: FontWeight.w400,
+                    fontSize: smallText,
+                    color: Colors.black87
+                  ),
+              ),
+              Text('${QuestionController.to.curTime.value}',
+                style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(
+                    fontFamily: 'Scada',
+                    fontWeight: FontWeight.w700,
+                    fontSize: averageText,
+                    color: (QuestionController.to.curTime.value > 5) ? Colors.black : Colors.red.shade300
+                  ),
+              ),
+            ],
+          ),
         ),
-        SizedBox(height: Spacing.smallSpacing),
-        BasicOptionButton(
-          textAnswer: widget.option2, 
-          onPressed: () {
-            setState(() {
-              clicked = '2';
-            });
-            QuestionController.to.selectedAnswer.value = widget.option2;
-          }, 
-          index: '2', 
-          selected: clicked
-        ),
-        SizedBox(height: Spacing.smallSpacing),
-        BasicOptionButton(
-          textAnswer: widget.option3, 
-          onPressed: () {
-            setState(() {
-              clicked = '3';
-            });
-            QuestionController.to.selectedAnswer.value = widget.option3;
-          }, 
-          index: '3', 
-          selected: clicked
-        ),
-        SizedBox(height: Spacing.smallSpacing),
-        BasicOptionButton(
-          textAnswer: widget.option4, 
-          onPressed: () {
-            setState(() {
-              clicked = '4';
-            });
-            QuestionController.to.selectedAnswer.value = widget.option4;
-          }, 
-          index: '4', 
-          selected: clicked
-        ),
-      ],
-    );
+      ));
+    }
   }
 }
-
-  class BasicOptionButton extends StatelessWidget{
-  const BasicOptionButton({super.key, 
-    required this.textAnswer, 
-    required this.onPressed, 
-    required this.index, 
-    required this.selected
-  });
-
-  final String textAnswer;
-  final VoidCallback onPressed;
-  final String index;
-  final String selected;
-  
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.7,
-        padding: EdgeInsets.all(Spacing.smallSpacing),
-        decoration: BoxDecoration(
-          color: (selected == index) ? Colors.green.shade100 : Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: (selected == index) ? Colors.green.shade400 : Colors.black12, width: 3)
-        ),
-        child:  Text(textAnswer,
-          style: Theme.of(context)
-            .textTheme
-            .headline6!
-            .copyWith(
-              fontFamily: 'Scada',
-              fontSize: smallText,
-              fontWeight: FontWeight.w400,
-              color: plainBlackBackground
-            ),
-        ),
-      ),
-    );
-  }
-
-  }

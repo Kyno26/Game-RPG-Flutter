@@ -114,17 +114,17 @@ class _ItemBoxState extends State<ItemBox> {
                               color: Colors.white70
                             )
                           ),
-                          Text('Berat: ${widget.itemWeight}',
-                            style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                                fontFamily: 'Scada',
-                                fontSize: smallText,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white
-                              ),
-                          ),
+                          // Text('Berat: ${widget.itemWeight}',
+                          //   style: Theme.of(context)
+                          //     .textTheme
+                          //     .headline6!
+                          //     .copyWith(
+                          //       fontFamily: 'Scada',
+                          //       fontSize: smallText,
+                          //       fontWeight: FontWeight.w500,
+                          //       color: Colors.white
+                          //     ),
+                          // ),
                         ],
                       )
                     )

@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/shop-controller.dart';
 import 'package:game_rpg/getx/profile-controller.dart';
 import 'package:game_rpg/widgets/confirm-dialog/dialog-core.dart';
@@ -206,28 +207,29 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
                   onPress: () async {
                     debugPrint('New Game Pressed');
                     
-                    if(continueGame){
-                      var newGame = false;
-                      newGame = await newGameDialog(context);
-                      if(newGame){
-                        ProfileController.to.setContinueGameStatus(gameStatus: false);
-                      }
-                    }else{
+                    // if(continueGame){
+                    //   var newGame = false;
+                    //   newGame = await newGameDialog(context);
+                    //   if(newGame){
+                    //     ProfileController.to.setContinueGameStatus(gameStatus: false);
+                    //   }
+                    // }else{
                       Navigator.pushNamed(context, 'characterSelectScreen');
-                    }
+                    // }
                   }, 
                   redSubtitle: continueGame,
                 ),
                 SizedBox(height: Spacing.mediumSpacing),
                 if(continueGame)
-                  GlassButton(
+                  Obx(() =>GlassButton(
                     title: 'Lanjutkan Permainan', 
-                    subTitle: 'Melanjutkan permainan dari titik terakhir dimainkan', 
+                    subTitle: 'Melanjutkan permainan dari titik terakhir dimainkan (stage: ${BattleFieldController.to.stageText.value})', 
                     iconFile: 'flag-icon', 
                     onPress: () {
+                      Navigator.pushNamed(context, 'battlefield');
                       debugPrint('Continue Game Pressed');
                     }, 
-                  ),
+                  )),
                 if(continueGame)
                   SizedBox(height: Spacing.mediumSpacing),
                 GlassButton(
@@ -236,6 +238,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
                   iconFile: 'book-icon', 
                   onPress: () {
                     debugPrint('Learn Subject Pressed');
+                    Navigator.pushNamed(context, 'lessonMainMenu');
                   }, 
                 ),
                 SizedBox(height: Spacing.mediumSpacing),

@@ -10,6 +10,7 @@ import 'package:game_rpg/component/ui-components/text-size.dart';
 import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/model/character.dart';
+import 'package:game_rpg/widgets/popup-dialog/level-select-dialog.dart';
 import 'package:game_rpg/widgets/select-character-box.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -434,20 +435,15 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
                       ),
                       const Spacer(),
                       GestureDetector(
-                        onTap: () {
-                          CharacterController.to.selectCharacter(
-                            name: CharacterController.to.selectedCharacterName.value,
-                            image: CharacterController.to.selectedCharacterPotraitImage.value, 
-                            hp: CharacterController.to.selectedCharacterHP.value, 
-                            atk: CharacterController.to.selectedCharacterAttack.value, 
-                            def: CharacterController.to.selectedCharacterDefense.value, 
-                            spd: CharacterController.to.selectedCharacterSpeed.value, 
-                            acc: CharacterController.to.selectedCharacterAccuracy.value, 
-                            crit: CharacterController.to.selectedCharacterCritRate.value
+                        onTap: () {        
+                          showDialog(
+                            context: context, 
+                            builder: (context) {
+                              return const LevelSelectDialog();
+                            }
                           );
-                          
-                          BattleFieldController.to.resetBattlegroundData();
-                          Navigator.pushReplacementNamed(context, 'battlefield');
+                          // BattleFieldController.to.resetBattlegroundData(stage: 1);
+                          // Navigator.pushReplacementNamed(context, 'battlefield');
                         },
                         child: Center(
                           child: Container(
@@ -459,7 +455,7 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
                               borderRadius: BorderRadius.circular(10)
                             ),
                             child: Center(
-                              child: Text('Mulai',
+                              child: Text('Pilih',
                                 style: Theme.of(context)
                                   .textTheme
                                   .headline6!

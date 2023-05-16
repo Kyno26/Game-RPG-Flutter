@@ -6,4 +6,6 @@
   const double averageText = 18;
 
   const double homeText = 16;
+
+  const double largeText = 22;
 // }

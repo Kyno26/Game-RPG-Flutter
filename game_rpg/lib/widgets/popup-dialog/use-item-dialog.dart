@@ -20,6 +20,7 @@ class _UseItemDialogState extends State<UseItemDialog> {
 
   @override
   void initState() {
+    print('Number of Item in Bag: ${CharacterController.to.itemList.length}');
     super.initState();
   }
 
@@ -59,7 +60,7 @@ class _UseItemDialogState extends State<UseItemDialog> {
               Center(
                 child: Obx(() => ElevatedButton(
                   onPressed: () {
-                    if(CharacterController.to.selectedItemID.value != '' && CharacterController.to.selectedItemID.value != '2'){
+                    if(CharacterController.to.selectedItemID.value != '' && CharacterController.to.selectedItemID.value != '9'){
                       CharacterController.to.playerPhase(actionSelected: 'Use Item');
                       Navigator.pop(context);
                     }

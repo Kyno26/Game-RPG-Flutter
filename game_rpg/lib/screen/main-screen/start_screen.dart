@@ -161,7 +161,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
             FadeIn(
                 delay: const Duration(milliseconds: 3000),
                 duration: const Duration(milliseconds: 3000),
-                child: Text('Power of Knowledge',
+                child: Text('Educational Biology Game',
                     style: Theme.of(context)
                         .textTheme
                         .headline6!
