@@ -28,6 +28,8 @@ class EnemyController extends GetxController{
   RxInt enemyCrit = 0.obs;
   RxString rawActionList = ''.obs;
 
+  RxInt enemyID = 0.obs;
+
   RxString enemyPassive = ''.obs;
   List enemyPassiveList = [].obs;
 
@@ -48,31 +50,70 @@ class EnemyController extends GetxController{
   enemySelectorController({required int stage}){
     print('stage id: $stage');
     //kelipatan 5 = BOSS Fight
-    if(stage < 3 || stage == 12){
-      //enemy name: Bee
-      return 1;
-    }else if(stage == 6 || stage == 7){
-      //enemy name: Skunk
-      return 4;
-    }else if(stage == 4 || stage == 9 || stage == 16){
-      //enemy name: Chameleon
-      return 2;
-    }else if(stage == 5 || stage == 8 || stage == 14){
-      //enemy name: Snake
-      return 3;
-    }else if(stage == 11 || stage == 13 || stage == 17 || stage == 19){
-      //enemy name: Bat
-      return 6;
-    }else if(stage == 10 || stage == 15){
-      //enemy name: Wolf
-      return 5;
-    }else if(stage == 18){
-      //enemy name: Fire Wolf
-      return 7;
-    }else if(stage == 20){
-      //enemy name: Dragon
-    }else{
-      debugPrint('Error: enemy selection!');
+    switch (stage) {
+      case 1:
+        enemyID.value = 1;
+        break;
+      case 2:
+        enemyID.value = 1;
+        break;
+      case 3:
+        enemyID.value = 1;
+        break;
+      case 4:
+        enemyID.value = 2;
+        break;
+      case 5:
+        enemyID.value = 3;
+        break;
+      case 6:
+        enemyID.value = 4;
+        break;
+      case 7:
+        enemyID.value = 4;
+        break;
+      case 8:
+        enemyID.value = 3;
+        break;
+      case 9:
+        enemyID.value = 2;
+        break;
+      case 10:
+        enemyID.value = 5;
+        break;
+      case 11:
+        enemyID.value = 6;
+        break;
+      case 12:
+        enemyID.value = 1;
+        break;
+      case 13:
+        enemyID.value = 6;
+        break;
+      case 14:
+        enemyID.value = 3;
+        break;
+      case 15:
+        enemyID.value = 5;
+        break;
+      case 16:
+        enemyID.value = 2;
+        break;
+      case 17:
+        enemyID.value = 6;
+        break;
+      case 18:
+        enemyID.value = 7;
+        break;
+      case 19:
+        enemyID.value = 6;
+        break;
+      case 20:
+        enemyID.value = 8;
+        break;
+      default:
+        debugPrint('Error: Selecting Enemy');
+        break;
     }
   }
 
@@ -103,7 +144,8 @@ class EnemyController extends GetxController{
   enemySpawner() async {
     var enemyId = enemySelectorController(stage: BattleFieldController.to.storyRound.value);
     print('Enemy id: $enemyId');
-    BattleFieldController.to.selectedEnemy = await DBManager.db.getEnemyByID(id: enemyId, tableName: 'enemy_lvl1').then((res) {
+    print('Enemy ID: ${enemyID.value}');
+    BattleFieldController.to.selectedEnemy = await DBManager.db.getEnemyByID(id: enemyID.value, tableName: 'enemy_lvl1').then((res) {
       enemyHealth.value = res!.hp;
       enemyName.value = res.name;
       enemyMaxHealth.value = res.hp;
@@ -145,7 +187,6 @@ class EnemyController extends GetxController{
             var attRes = await BattleFieldController.to.dodgeChance(spd: CharacterController.to.playerSpd.value, acc: enemyAcc.value, defender: CharacterController.to.playerName.value, attacker: 'enemy');
             if(attRes == 'HIT'){
               BattleFieldController.to.countDmgReceived(atk: enemyAtk.value, def: CharacterController.to.playerDef.value, hp: CharacterController.to.playerHealth, maxHp: CharacterController.to.playerMaxHealth.value, critRate: enemyCrit.value, attacker: enemyName.value, defender: CharacterController.to.playerName.value, attackerHp: enemyHealth);
-              // AudioController.to.playNormalAtkBGM();
             }
             break;
           case 'defend':

@@ -29,7 +29,7 @@ class ProfileController extends GetxController{
 
   setDefaultValue(){
     ShopController.to.totalCoins.value = 0;
-    continueGameStatus.value = false;
+    // continueGameStatus.value = false;
     highScore.value = 0;
     highestQuestionAnswered.value = 0;
     

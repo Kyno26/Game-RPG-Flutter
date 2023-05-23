@@ -218,7 +218,7 @@ class CharacterController extends GetxController{
       switch (actionSelected) {
         case 'Attack':
           var attRes = await BattleFieldController.to.dodgeChance(spd: EnemyController.to.enemySpd.value, acc: playerAcc.value, defender: EnemyController.to.enemyName.value, attacker: 'player', defenderPassiveSkill: EnemyController.to.enemyPassiveList);
-          if(attRes == 'HIT'){
+          if(attRes == 'HIT' || ItemController.to.freezeActive.value){
             BattleFieldController.to.countDmgReceived(atk: CharacterController.to.playerAtk.value, def: EnemyController.to.enemyDef.value, hp: EnemyController.to.enemyHealth, maxHp: EnemyController.to.enemyMaxHealth.value, critRate: playerCrit.value, attacker: playerName.value, defender: EnemyController.to.enemyName.value, attackerHp: playerHealth);
             // AudioController.to.playNormalAtkBGM();
           }

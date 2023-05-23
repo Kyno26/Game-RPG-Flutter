@@ -49,6 +49,20 @@ class GameOverDialog extends StatelessWidget{
                     ),
                   ),
                   SizedBox(height: Spacing.mediumSpacing),
+                  if(BattleFieldController.to.gameFinished.value)
+                  Center(
+                    child: Text('Permainan Selesai',
+                      style: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .copyWith(
+                          fontFamily: 'Scada',
+                          fontWeight: FontWeight.w400,
+                          fontSize: smallText,
+                          color: Colors.black
+                        ),
+                    ),
+                  ),
                   Center(
                     child: RichText(
                       textDirection: TextDirection.ltr,
@@ -124,49 +138,49 @@ class GameOverDialog extends StatelessWidget{
                       ),
                     ),
                   ),
-                  Center(
-                    child: RichText(
-                      textDirection: TextDirection.ltr,
-                      text: TextSpan(
-                        text: 'Koin dimiliki: ',
-                        style: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(
-                            fontFamily: 'Scada',
-                            fontSize: smallText,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
-                          ),
-                        children: [
-                          TextSpan(
-                            text: ShopController.to.totalCoins.value.toString(),
-                            style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                                fontFamily: 'Scada',
-                                fontSize: smallText,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black87,
-                              ), 
-                          ),
-                          TextSpan(
-                            text: ' + ($coinsEarned)',
-                            style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                                fontFamily: 'Scada',
-                                fontSize: smallText,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ), 
-                          ),
-                        ]
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: RichText(
+                  //     textDirection: TextDirection.ltr,
+                  //     text: TextSpan(
+                  //       text: 'Koin dimiliki: ',
+                  //       style: Theme.of(context)
+                  //         .textTheme
+                  //         .headline6!
+                  //         .copyWith(
+                  //           fontFamily: 'Scada',
+                  //           fontSize: smallText,
+                  //           fontWeight: FontWeight.w400,
+                  //           color: Colors.black87,
+                  //         ),
+                  //       children: [
+                  //         TextSpan(
+                  //           text: ShopController.to.totalCoins.value.toString(),
+                  //           style: Theme.of(context)
+                  //             .textTheme
+                  //             .headline6!
+                  //             .copyWith(
+                  //               fontFamily: 'Scada',
+                  //               fontSize: smallText,
+                  //               fontWeight: FontWeight.w400,
+                  //               color: Colors.black87,
+                  //             ), 
+                  //         ),
+                  //         TextSpan(
+                  //           text: ' + ($coinsEarned)',
+                  //           style: Theme.of(context)
+                  //             .textTheme
+                  //             .headline6!
+                  //             .copyWith(
+                  //               fontFamily: 'Scada',
+                  //               fontSize: smallText,
+                  //               fontWeight: FontWeight.w600,
+                  //               color: Colors.black,
+                  //             ), 
+                  //         ),
+                  //       ]
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: Spacing.mediumSpacing),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

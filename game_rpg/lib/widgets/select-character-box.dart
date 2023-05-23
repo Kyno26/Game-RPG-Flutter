@@ -28,9 +28,11 @@ class _SelectCharacterBoxState extends State<SelectCharacterBox>{
 
   @override
   Widget build(BuildContext context) {
-    return (!unlocked)
-    ? const SizedBox(width: 0, height: 0,)
-    : GestureDetector(
+    return 
+    // (!unlocked)
+    // ? const SizedBox(width: 0, height: 0,)
+    // : 
+    GestureDetector(
       onTap: () {
         debugPrint('===== DATA CHARACTER =====');
         debugPrint(widget.character.id.toString());
@@ -38,7 +40,7 @@ class _SelectCharacterBoxState extends State<SelectCharacterBox>{
         debugPrint(unlocked.toString());
         debugPrint('=========================');
 
-        if(unlocked){
+        // if(unlocked){
           CharacterController.to.characterSelected(
             characterId: widget.character.id, 
             characterName: widget.character.name, 
@@ -51,7 +53,7 @@ class _SelectCharacterBoxState extends State<SelectCharacterBox>{
             characterImage: widget.character.imageFull,
             characterPotrait: widget.character.imageUnlocked,
           );
-        }
+        // }
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.3,
@@ -76,8 +78,11 @@ class _SelectCharacterBoxState extends State<SelectCharacterBox>{
               padding: EdgeInsets.all(Spacing.smallSpacing),
               child: Column(
                 children: [
-                  Text((unlocked) ? widget.character.name : '???',
-                    style: Theme.of(context)
+                  Text(
+                    // (unlocked) ? 
+                    widget.character.name 
+                    // : '???'
+                    ,style: Theme.of(context)
                       .textTheme
                       .headline5!
                       .copyWith(

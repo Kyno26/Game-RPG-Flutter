@@ -1,10 +1,13 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:game_rpg/component/shared-preferences-data/global-sharedpreferences.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
+import 'package:game_rpg/getx/item-controller.dart';
 import 'package:get/get.dart';
 
 class LevelSelectDialog extends StatefulWidget{
@@ -16,9 +19,23 @@ class LevelSelectDialog extends StatefulWidget{
 
 class _LevelSelectDialogState extends State<LevelSelectDialog> {
   int selected = 0;
+  bool stage1 = true;
+  bool stage2 = false;
+  bool stage3 = false;
+  bool stage4 = false;
+
+  getStageProgress() async {
+    stage2 = await getBoolLocalData('stage2_unlocked') as bool;
+    stage3 = await getBoolLocalData('stage3_unlocked') as bool; 
+    stage4 = await getBoolLocalData('stage4_unlocked') as bool;
+    print('stage 2 status: $stage2');
+    print('stage 3 status: $stage3');
+    print('stage 4 status: $stage4');
+  }
 
   @override
   void initState() {
+    getStageProgress();
     super.initState();
   }
 
@@ -41,6 +58,7 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
           ),
           child: Column(
             children: [
+              SizedBox(height: Spacing.smallSpacing),
               Center(
                 child: Text('Pilih Level',
                   style: Theme.of(context)
@@ -49,16 +67,17 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                     .copyWith(
                       fontFamily: 'Scada',
                       fontWeight: FontWeight.w600,
-                      fontSize: smallText,
+                      fontSize: averageText,
                       color: Colors.black
                     ),
                 )
               ),
               SizedBox(height: Spacing.mediumSpacing),
-              Obx(() => levelOptBtn(
+              // Obx(() => 
+              levelOptBtn(
                 stage: 'Stage 1-1', 
                 subject: 'Sistem Pernapasan', 
-                stageStatus: BattleFieldController.to.stage1Unlocked.value, 
+                stageStatus: stage1, 
                 onPress: (){
                   setState(() {
                     selected = 1;
@@ -67,12 +86,14 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 }, 
                 selected: selected, 
                 index: 1
-              )),
+              // )
+              ),
               SizedBox(height: Spacing.smallSpacing),
-              Obx(() => levelOptBtn(
+              // Obx(() => 
+              levelOptBtn(
                 stage: 'Stage 2-1', 
                 subject: 'Sistem Pencernaan', 
-                stageStatus: BattleFieldController.to.stage2Unlocked.value, 
+                stageStatus: stage2, 
                 onPress: (){
                   setState(() {
                     selected = 2;
@@ -81,12 +102,14 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 },
                 selected: selected, 
                 index: 2
-              )),
+              // )
+              ),
               SizedBox(height: Spacing.smallSpacing),
-              Obx(() => levelOptBtn(
+              // Obx(() => 
+              levelOptBtn(
                 stage: 'Stage 3-1', 
                 subject: 'Sistem Pertahanan Tubuh', 
-                stageStatus: BattleFieldController.to.stage3Unlocked.value, 
+                stageStatus: stage3, 
                 onPress: (){
                   setState(() {
                     selected = 3;
@@ -95,12 +118,14 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 },
                 selected: selected, 
                 index: 3
-              )),
+              // )
+              ),
               SizedBox(height: Spacing.smallSpacing),
-              Obx(() => levelOptBtn(
+              // Obx(() => 
+              levelOptBtn(
                 stage: 'Stage 4-1', 
                 subject: 'Semua Materi', 
-                stageStatus: BattleFieldController.to.stage4Unlocked.value, 
+                stageStatus: stage4, 
                 onPress: (){
                   setState(() {
                     selected = 4;
@@ -109,12 +134,14 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 },
                 selected: selected, 
                 index: 4
-              )),
+              // )
+              ),
               SizedBox(height: Spacing.mediumSpacing),
               Center(
                 child: ElevatedButton(
                   onPressed: (){
                     if(selected != 0){
+                      AudioController.to.lobbyBGM.dispose();
                       CharacterController.to.selectCharacter(
                         name: CharacterController.to.selectedCharacterName.value,
                         image: CharacterController.to.selectedCharacterPotraitImage.value, 
@@ -128,19 +155,48 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
 
                       Navigator.pop(context);
                       BattleFieldController.to.resetBattlegroundData(stage: BattleFieldController.to.storyRound.value);
+
+                      if(BattleFieldController.to.storyRound.value == 6){
+                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
+                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+                        
+                        ItemController.to.addItem(itemID: 1);
+                        ItemController.to.addItem(itemID: 1);
+                        ItemController.to.addItem(itemID: 5);
+
+                      }else if(BattleFieldController.to.storyRound.value == 11){
+                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
+                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+
+                        ItemController.to.addItem(itemID: 1);
+                        ItemController.to.addItem(itemID: 2);
+                        ItemController.to.addItem(itemID: 4);
+                        ItemController.to.addItem(itemID: 11);
+
+                      }else if(BattleFieldController.to.storyRound.value == 16){
+                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 15;
+                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 15;
+
+                        ItemController.to.addItem(itemID: 6);
+                        ItemController.to.addItem(itemID: 1);
+                        ItemController.to.addItem(itemID: 10);
+                        ItemController.to.addItem(itemID: 11);
+                        ItemController.to.addItem(itemID: 11);
+                      }
+
                       Navigator.pushReplacementNamed(context, 'battlefield');
                     }
                   }, 
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: Spacing.mediumSpacing, horizontal: Spacing.smallSpacing),
-                    backgroundColor: Colors.green,
+                    padding: EdgeInsets.symmetric(horizontal: Spacing.smallSpacing),
+                    backgroundColor: (selected != 0) ? Colors.green : Colors.white,
+                    fixedSize: Size.fromWidth(MediaQuery.of(context).size.width * 0.3),
                     shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.green.shade700, width: 2),
+                      side: BorderSide(color: (selected != 0) ? Colors.green.shade700 : Colors.black54, width: 2),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     shadowColor: Colors.green.shade800,
                     elevation: 3,
-                    
                   ),
                   child: Text('Mulai',
                     style: Theme.of(context)

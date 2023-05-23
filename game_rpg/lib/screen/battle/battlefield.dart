@@ -89,6 +89,7 @@ class _BattleFieldState extends State<BattleField> {
     // AudioController.to.bgmPlayer1.dispose();
     AudioController.to.slashAtkBGM1.dispose();
     AudioController.to.critSlashAtkBGM1.dispose();
+    AudioController.to.playLobbyBgm();
     super.dispose();
   }
   
@@ -321,62 +322,72 @@ class _BattleFieldState extends State<BattleField> {
                         )
                         : null,
                     ),
-                    Center(
-                      child: Text(EnemyController.to.enemyName.value,
-                        style: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(
-                            fontFamily: 'Scada',
-                            fontSize: smallText,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white54,
+                        border: Border.all(color: Colors.black45)
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.05,
-                          height: MediaQuery.of(context).size.width * 0.05,
-                          child: SvgPicture.asset('assets/icons/heart-icon.svg', fit: BoxFit.fill),
-                        ),
-                        Obx(() => Text('HP: ${EnemyController.to.enemyHealth.value} /  ${EnemyController.to.enemyMaxHealth.value}',
-                          style: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .copyWith(
-                              fontFamily: 'Scada',
-                              fontSize: smallText,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Text(EnemyController.to.enemyName.value,
+                              style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                  fontFamily: 'Scada',
+                                  fontSize: smallText,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black87,
+                                ),
                             ),
-                        )),
-                        SizedBox(width: Spacing.smallSpacing),
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context, 
-                              builder: (context) {
-                                return const EnemyStatDetail();
-                              }
-                            );
-                          },
-                          child: Text('Detail',
-                            style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                                fontFamily: 'Scada',
-                                decoration: TextDecoration.underline,
-                                fontSize: smallText,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
                           ),
-                        )
-                      ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.05,
+                                height: MediaQuery.of(context).size.width * 0.05,
+                                child: SvgPicture.asset('assets/icons/heart-icon.svg', fit: BoxFit.fill),
+                              ),
+                              Obx(() => Text('HP: ${EnemyController.to.enemyHealth.value} /  ${EnemyController.to.enemyMaxHealth.value}',
+                                style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    fontFamily: 'Scada',
+                                    fontSize: smallText,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                              )),
+                              SizedBox(width: Spacing.smallSpacing),
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context, 
+                                    builder: (context) {
+                                      return const EnemyStatDetail();
+                                    }
+                                  );
+                                },
+                                child: Text('Detail',
+                                  style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                      fontFamily: 'Scada',
+                                      decoration: TextDecoration.underline,
+                                      fontSize: smallText,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -546,7 +557,7 @@ class _BattleFieldState extends State<BattleField> {
                                                   children: [
                                                     Container(
                                                       width: MediaQuery.of(context).size.width * 0.7,
-                                                      height: MediaQuery.of(context).size.height * 0.125,
+                                                      height: MediaQuery.of(context).size.height * 0.15,
                                                       decoration: BoxDecoration(
                                                         borderRadius: BorderRadius.circular(8),
                                                         color: Colors.white,
@@ -556,8 +567,8 @@ class _BattleFieldState extends State<BattleField> {
                                                           Container(
                                                             width: MediaQuery.of(context).size.width * 0.8,
                                                             height: MediaQuery.of(context).size.height * 0.05,
-                                                            decoration: const BoxDecoration(
-                                                              color: darkYellowColor,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.yellow.shade700,
                                                               // border: Border(bottom: BorderSide(color: plainBlackBackground, width: 1)),
                                                               borderRadius: BorderRadius.only(
                                                                 topLeft: Radius.circular(8),
@@ -578,9 +589,10 @@ class _BattleFieldState extends State<BattleField> {
                                                               ),
                                                             )
                                                           ),
-                                                          SizedBox(
+                                                          Container(
                                                             width: MediaQuery.of(context).size.width * 0.8,
-                                                            height: MediaQuery.of(context).size.height * 0.075,
+                                                            height: MediaQuery.of(context).size.height * 0.1,
+                                                            padding: EdgeInsets.symmetric(horizontal: Spacing.smallSpacing),
                                                             // color: Colors.yellow,
                                                             child: Center(
                                                               child: Text('Anda tidak dapat menyerang akibat dari status negatif selama $count giliran',

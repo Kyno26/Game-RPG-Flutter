@@ -201,9 +201,13 @@ class ItemController extends GetxController{
         break;
       case '14':
         freezeActive.value = true;
+        curFreezeDur.value = 0;
+        removeItemFromItemList(itemID: int.parse(itemID));
         break;
       case '15':
         burnActive.value = true;
+        curBurnDur.value = 0;
+        removeItemFromItemList(itemID: int.parse(itemID));
         break;
       case '16':
         //MED KIT ADD MAX HP 15

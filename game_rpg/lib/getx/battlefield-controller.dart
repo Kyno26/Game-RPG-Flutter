@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:game_rpg/component/databaseSQLite/db-manager.dart';
+import 'package:game_rpg/component/shared-preferences-data/user-data.dart';
 import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/getx/enemy-controller.dart';
@@ -43,6 +44,8 @@ class BattleFieldController extends GetxController{
   RxBool showEnemyAnimation = false.obs;
   RxBool showPlayerAnimation = false.obs;
 
+  RxBool gameFinished = false.obs;
+
   Buff? buffObtained;
   List battleLog = [].obs;
 
@@ -76,11 +79,14 @@ class BattleFieldController extends GetxController{
   }
 
   stageUnlock() {
-    if(storyRound.value == 5){
+    if(storyRound.value == 6){
+      saveStageProgress(true, false, false);
       stage2Unlocked.value = true;
-    }else if(storyRound.value == 10){
+    }else if(storyRound.value == 11){
+      saveStageProgress(true, true, false);
       stage3Unlocked.value = true;
-    }else if(storyRound.value == 15){
+    }else if(storyRound.value == 16){
+      saveStageProgress(true, true, true);
       stage4Unlocked.value = true;
     }
   }
@@ -113,7 +119,7 @@ class BattleFieldController extends GetxController{
     ProfileController.to.continueGameStatus.value = true;
     QuestionController.to.showAnswer.value = false;
     QuestionController.to.showAnimation.value = false;
-    giveUpgradePoint(round: storyRound.value);
+    // giveUpgradePoint(round: storyRound.value);
     // QuestionController.to.currentScore.value = 0;
     // ShopController.to.coinGetBattle.value = 0;
     // storyRound.value = 1;
@@ -132,6 +138,7 @@ class BattleFieldController extends GetxController{
     enemyAccBuff.clear();
     enemySpdBuff.clear();
     itemShowUp.clear();
+    gameFinished.value = false;
     QuestionController.to.clearQuestionValue();
     CharacterController.to.itemList.clear();
     CharacterController.to.selectedItemID.value = '';
@@ -179,35 +186,47 @@ class BattleFieldController extends GetxController{
   }
 
   questionScoreController(int round) {
-    if (round > 0 && round < 8) {
+    if (round < 3) {
+      //round 1-2
       return 2;
-    } else if (round == 10){
-      return 10;
-    } else if (round == 20 || round == 30){
-      return 15;
-    } else if (round == 40){
-      return 20;
-    } else if (round >= 8 && round < 16){
+    } else if (round < 5){
+      //round 3-4
+      return 3;
+    } else if (round == 5){
+      //round 5
       return 5;
-    } else if (round >= 16 && round < 24){
+    } else if (round < 8){
+      //round 6-7
+      return 6;
+    } else if (round < 10){
+      //round 8-9
       return 7;
-    } else if (round >= 24 && round < 32){
+    } else if (round == 10){
+      //round 10
+      return 8;
+    } else if (round < 15){
+      //round 11-14
+      return 9;
+    } else if (round == 15){
+      //round 15
       return 10;
-    } else if (round >= 32 && round < 40){
-      return 13;
-    } else {
+    } else if (round < 19){
+      //round 16-19
+      return 10;
+    }else {
+      //round 19-20
       return 15;
     }
   }
 
   giveUpgradePoint({required int round}){
-    if(round == 5){
+    if(storyRound.value == 6){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
-    }else if(round == 10){
+    }else if(storyRound.value == 11){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
-    }else if(round == 15){
+    }else if(storyRound.value == 16){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 15;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 15;
     }
@@ -216,14 +235,14 @@ class BattleFieldController extends GetxController{
   stageCountController(int round) {
     if(storyRound.value > 0 && storyRound.value <= 5){
       return stageText.value = '1 - $round';
-    }else if (round > 5 && round <= 10){
+    }else if (round >= 6 && round <= 10){
       return stageText.value = '2 - ${round - 5}';
-    }else if (round > 10 && round <= 15){
+    }else if (round >= 11 && round <= 15){
       return stageText.value = '3 - ${round - 10}';
-    }else if (round > 15 && round <= 20){
+    }else if (round >= 16 && round <= 20){
       return stageText.value = '4 - ${round - 15}';
     }else {
-      return stageText.value = 'Endless Mode';
+      return stageText.value = 'Game Clear';
     }
   }
 
@@ -235,6 +254,7 @@ class BattleFieldController extends GetxController{
 
   battleTurnSystem() {
     if(CharacterController.to.playerHealth.value > 0){
+      addBattleLog(message: 'current story stage ${storyRound.value}', type: 'FREE');
       if(EnemyController.to.enemyHealth.value > 0){
         if(turn.value == 'enemy'){
           // turnIcon.value = 'assets/icons/enemy-turn-icon.svg';
@@ -244,6 +264,9 @@ class BattleFieldController extends GetxController{
           enemyTurn.value++;
         }
       }else{
+        if(storyRound.value == 20){
+          gameFinished.value = true;
+        }else{
         //Enemy Defeated
         addBattleLog(attacker: CharacterController.to.playerName.value, defender: EnemyController.to.enemyName.value, message: 'berhasil mengalahkan', type: 'DEFEAT');
         turn.value = 'waiting';
@@ -262,11 +285,10 @@ class BattleFieldController extends GetxController{
         storyRound.value++;
         stageText.value = stageCountController(storyRound.value);
         scorePerQuestion.value = questionScoreController(storyRound.value);
-        QuestionController.to.currentScore.value = QuestionController.to.currentScore.value + 30;
+        QuestionController.to.currentScore.value = QuestionController.to.currentScore.value + 20;
         ShopController.to.coinGetBattle.value = ShopController.to.coinGetBattle.value + 15;
-        // if((enemyDefeated.value % 2) == 0){
         SpecialDialogController.to.showitemGetDialog();
-        // }
+        }
       }
     }else{
       //Player Defeated
@@ -276,7 +298,7 @@ class BattleFieldController extends GetxController{
         ItemController.to.lifeNecklaceOn.value = false;
         addBattleLog(message: 'Item Jimat Penyelamat telah digunakan!', type: 'USE ITEM');
       }else{
-        ProfileController.to.continueGameStatus.value = true;
+        ProfileController.to.continueGameStatus.value = false;
         SpecialDialogController.to.showGameOverDialog();
       }
     }

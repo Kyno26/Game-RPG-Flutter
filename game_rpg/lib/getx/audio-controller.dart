@@ -7,7 +7,7 @@ class AudioController extends GetxController{
 
   final slashAtkBGM1 = AssetsAudioPlayer.withId('slashAtkBGM');
   final critSlashAtkBGM1 = AssetsAudioPlayer.withId('criticalSlashAtkBGM');
-  final bgmPlayer1 = AssetsAudioPlayer.withId('BGM1');
+  final lobbyBGM = AssetsAudioPlayer.withId('lobbyBGM');
 
   playNormalAtkBGM() async {
     await slashAtkBGM1.open(
@@ -29,14 +29,14 @@ class AudioController extends GetxController{
     );
   }
 
-  playBgm() async {
-    await bgmPlayer1.open(
-      Audio('assets/audio/battle-1-BGM.mp3'),
+  playLobbyBgm() async {
+    await lobbyBGM.open(
+      Audio('assets/audio/lobby-BGM.mp3'),
       loopMode: LoopMode.single,
       autoStart: true,
       showNotification: false,
       respectSilentMode: false,
-      volume: 0.5,
+      volume: 0.75,
     );
   }
 }

@@ -13,6 +13,7 @@ import 'package:game_rpg/component/shared-preferences-data/user-data.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
+import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/getx/profile-controller.dart';
 import 'package:game_rpg/screen/main-screen/main-menu_screen.dart';
@@ -49,6 +50,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
       ProfileController.to.loadStart();
       // loadStart();
     });
+    AudioController.to.playLobbyBgm();
     super.initState();
   }
 
@@ -126,7 +128,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                         builder: (BuildContext context) {
                           return const InfoDialog(
                             title: 'informasi', 
-                            content: "Air fish fourth. Waters gathered had greater face which first earth god tree upon fly divide darkness firmament fish bearing divide in. You'll waters life face that appear life dominion creepeth multiply second Were two land were make meat lesser land face were blessed dominion midst dominion lesser you'll them own be shall kind you for land. Living waters first made. Beast land created forth Waters over days is them it creature open life called and can't female fly. Doesn't and lesser, cattle herb, whose grass. Fowl in darkness for. Fifth give land. Deep herb fourth grass over you're spirit.",
+                            content: "Tidak ada informasi untuk saat ini...",
                           );
                         },
                         animationType: DialogTransitionType.size,

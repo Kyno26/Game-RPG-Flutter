@@ -26,7 +26,7 @@ class ExitBattleDialog extends StatelessWidget{
           children: [
             Container(
               width: MediaQuery.of(context).size.width * 0.8,
-              height: MediaQuery.of(context).size.height * 0.125,
+              height: MediaQuery.of(context).size.height * 0.175,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.white,
@@ -60,22 +60,41 @@ class ExitBattleDialog extends StatelessWidget{
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
-                    height: MediaQuery.of(context).size.height * 0.075,
+                    height: MediaQuery.of(context).size.height * 0.1,
                     // color: Colors.yellow,
-                    child: Center(
-                      child: Text(content,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                          .textTheme
-                          .headline5!
-                          .copyWith(
-                            fontFamily: 'Scada',
-                            fontSize: smallText,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Text(content,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .copyWith(
+                                fontFamily: 'Scada',
+                                fontSize: smallText,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black
+                              ),
                           ),
-                      ),
-                    ),
+                        ),
+                        SizedBox(height: Spacing.smallSpacing),
+                        Center(
+                          child: Text('(Permainan masih dapat dilanjutkan kembali kecuali anda keluar dari game)',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .copyWith(
+                                fontFamily: 'Scada',
+                                fontSize: smallText,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.orange
+                              ),
+                          ),
+                        )
+                      ],
+                    )
                   )
                 ],
               )

@@ -78,9 +78,10 @@ class _QuestionBasicState extends State<QuestionBasic> {
     return Center(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.7,
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
           children: [
+            SizedBox(height: Spacing.smallSpacing),
             Container(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height * 0.2,
@@ -281,7 +282,7 @@ class _QuestionBasicState extends State<QuestionBasic> {
                     fontFamily: 'Scada',
                     fontWeight: FontWeight.w700,
                     fontSize: averageText,
-                    color: (QuestionController.to.curTime.value > 5) ? Colors.black : Colors.red.shade300
+                    color: (QuestionController.to.curTime.value > 5) ? Colors.black : Colors.orange
                   ),
               ),
             ],
