@@ -106,6 +106,10 @@ class ItemController extends GetxController{
     }
     itemShowUp.clear();
     CharacterController.to.selectedItemID.value = '';
+
+    if(itemID == 9){
+      lifeNecklaceOn.value = true;
+    }
   }
 
   useItem({required String itemID}) {

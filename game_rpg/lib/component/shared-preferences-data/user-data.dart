@@ -12,23 +12,18 @@ Future<void> createConfigData() async {
   userPrefs.setInt('version', dataVersion);
 
   userPrefs.setBool('stage1_unlocked', true);
-  userPrefs.setBool('stage2_unlocked', false);
-  userPrefs.setBool('stage3_unlocked', false);
-  userPrefs.setBool('stage4_unlocked', false);
+  userPrefs.setBool('stage2_unlocked', true);
+  userPrefs.setBool('stage3_unlocked', true);
+  userPrefs.setBool('stage4_unlocked', true);
 }
 
 Future<void> saveStageProgress(
-  bool isStage2Unlocked,
-  bool isStage3Unlocked,
-  bool isStage4Unlocked,
+  String stageName,
 ) async {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   final SharedPreferences userPrefs = await prefs;
 
-  userPrefs.setBool('stage1_unlocked', true);
-  userPrefs.setBool('stage2_unlocked', isStage2Unlocked);
-  userPrefs.setBool('stage3_unlocked', isStage3Unlocked);
-  userPrefs.setBool('stage4_unlocked', isStage4Unlocked);
+  userPrefs.setBool(stageName, true);
 }
 
 //check if user data exist

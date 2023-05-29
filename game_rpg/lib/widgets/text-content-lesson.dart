@@ -13,7 +13,7 @@ class SubTitleContent extends StatelessWidget{
     return Align(
       alignment: Alignment.topLeft,
       child: Text(subTitle,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.left,
         style: Theme.of(context)
           .textTheme
           .headline6!
@@ -21,7 +21,7 @@ class SubTitleContent extends StatelessWidget{
             fontFamily: 'Scada',
             fontWeight: FontWeight.w700,
             fontSize: smallText,
-            color: Colors.black
+            color: Colors.white
           ),
       ),
     );
@@ -46,7 +46,7 @@ class ContentText extends StatelessWidget{
             fontFamily: 'Scada',
             fontWeight: FontWeight.w500,
             fontSize: smallText,
-            color: Colors.black
+            color: Colors.white
           ),
       ),
     );

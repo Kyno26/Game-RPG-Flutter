@@ -36,6 +36,7 @@ class AudioController extends GetxController{
       autoStart: true,
       showNotification: false,
       respectSilentMode: false,
+      playInBackground: PlayInBackground.disabledRestoreOnForeground,
       volume: 0.75,
     );
   }

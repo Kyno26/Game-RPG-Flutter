@@ -63,6 +63,7 @@ class _BattleFieldState extends State<BattleField> {
       autoStart: true,
       showNotification: false,
       respectSilentMode: false,
+      playInBackground: PlayInBackground.disabledRestoreOnForeground,
       volume: 0.5,
     );
   }

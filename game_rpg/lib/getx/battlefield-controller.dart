@@ -80,13 +80,13 @@ class BattleFieldController extends GetxController{
 
   stageUnlock() {
     if(storyRound.value == 6){
-      saveStageProgress(true, false, false);
+      saveStageProgress('stage2_unlocked');
       stage2Unlocked.value = true;
     }else if(storyRound.value == 11){
-      saveStageProgress(true, true, false);
+      saveStageProgress('stage3_unlocked');
       stage3Unlocked.value = true;
     }else if(storyRound.value == 16){
-      saveStageProgress(true, true, true);
+      saveStageProgress('stage4_unlocked');
       stage4Unlocked.value = true;
     }
   }
@@ -254,7 +254,7 @@ class BattleFieldController extends GetxController{
 
   battleTurnSystem() {
     if(CharacterController.to.playerHealth.value > 0){
-      addBattleLog(message: 'current story stage ${storyRound.value}', type: 'FREE');
+      // addBattleLog(message: 'current story stage ${storyRound.value}', type: 'FREE');
       if(EnemyController.to.enemyHealth.value > 0){
         if(turn.value == 'enemy'){
           // turnIcon.value = 'assets/icons/enemy-turn-icon.svg';
@@ -416,7 +416,7 @@ class BattleFieldController extends GetxController{
       }else if(countRate < 1){
         hitRate = 2;
         missRate = 3;
-      }else if(countRate > 0 && countRate <= 15){
+      }else if(countRate >= 1 && countRate <= 15){
         hitRate = 3;
         missRate = 2;
       }else if(countRate > 15){

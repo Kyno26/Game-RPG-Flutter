@@ -139,7 +139,7 @@ class _ImmuneSystemScreenState extends State<ImmuneSystemScreen> {
                             fontFamily: 'Scada',
                             fontWeight: FontWeight.w800,
                             fontSize: largeText,
-                            color: Colors.black
+                            color: Colors.white
                           ),
                       ),
                     ),

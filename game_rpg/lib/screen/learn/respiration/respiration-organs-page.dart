@@ -40,7 +40,7 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                 fontFamily: 'Scada',
                 fontWeight: FontWeight.w500,
                 fontSize: smallText,
-                color: Colors.black87
+                color: Colors.white
               ),
           ),
           SizedBox(height: Spacing.mediumSpacing),

@@ -246,7 +246,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
                   redSubtitle: continueGame,
                 ),
                 SizedBox(height: Spacing.mediumSpacing),
-                if(continueGame)
+                if(ProfileController.to.continueGameStatus.value)
                   Obx(() =>GlassButton(
                     title: 'Lanjutkan Permainan', 
                     subTitle: 'Melanjutkan permainan dari titik terakhir dimainkan (stage: ${BattleFieldController.to.stageText.value})', 
@@ -256,7 +256,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
                       debugPrint('Continue Game Pressed');
                     }, 
                   )),
-                if(continueGame)
+                if(ProfileController.to.continueGameStatus.value)
                   SizedBox(height: Spacing.mediumSpacing),
                 GlassButton(
                   title: 'Pelajari Materi', 

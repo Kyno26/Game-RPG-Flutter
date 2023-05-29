@@ -24,10 +24,17 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
   bool stage3 = false;
   bool stage4 = false;
 
+  int stageSelected = 1;
+
   getStageProgress() async {
-    stage2 = await getBoolLocalData('stage2_unlocked') as bool;
-    stage3 = await getBoolLocalData('stage3_unlocked') as bool; 
-    stage4 = await getBoolLocalData('stage4_unlocked') as bool;
+    var s2 = await getBoolLocalData('stage2_unlocked') as bool;
+    var s3 = await getBoolLocalData('stage3_unlocked') as bool; 
+    var s4 = await getBoolLocalData('stage4_unlocked') as bool;
+    setState(() {
+      stage2 = s2;
+      stage3 = s3;
+      stage4 = s4;
+    });
     print('stage 2 status: $stage2');
     print('stage 3 status: $stage3');
     print('stage 4 status: $stage4');
@@ -81,8 +88,8 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 onPress: (){
                   setState(() {
                     selected = 1;
+                    stageSelected = 1;
                   });
-                  BattleFieldController.to.storyRound.value = 1;
                 }, 
                 selected: selected, 
                 index: 1
@@ -97,8 +104,8 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 onPress: (){
                   setState(() {
                     selected = 2;
+                    stageSelected = 6;
                   });
-                  BattleFieldController.to.storyRound.value = 6;
                 },
                 selected: selected, 
                 index: 2
@@ -113,8 +120,8 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 onPress: (){
                   setState(() {
                     selected = 3;
+                    stageSelected = 11;
                   });
-                  BattleFieldController.to.storyRound.value = 11;
                 },
                 selected: selected, 
                 index: 3
@@ -129,8 +136,9 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                 onPress: (){
                   setState(() {
                     selected = 4;
+                    stageSelected = 16;
                   });
-                  BattleFieldController.to.storyRound.value = 16;
+
                 },
                 selected: selected, 
                 index: 4
@@ -152,6 +160,7 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                         acc: CharacterController.to.selectedCharacterAccuracy.value, 
                         crit: CharacterController.to.selectedCharacterCritRate.value
                       );
+                      BattleFieldController.to.storyRound.value = stageSelected;
 
                       Navigator.pop(context);
                       BattleFieldController.to.resetBattlegroundData(stage: BattleFieldController.to.storyRound.value);

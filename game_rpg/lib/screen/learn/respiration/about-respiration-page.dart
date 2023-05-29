@@ -37,7 +37,7 @@ class _AboutRespirationPageState extends State<AboutRespirationPage> {
                     fontFamily: 'Scada',
                     fontWeight: FontWeight.w500,
                     fontSize: smallText,
-                    color: Colors.black87
+                    color: Colors.white
                   ),
               ),
               SizedBox(height: Spacing.mediumSpacing),

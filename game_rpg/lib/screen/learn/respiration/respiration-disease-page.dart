@@ -26,7 +26,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
       child: Column(
         children: [
           Text('Gangguan pada Sistem Pernapasan Manusia',
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.left,
             style: Theme.of(context)
               .textTheme
               .headline6!
@@ -34,7 +34,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
                 fontFamily: 'Scada',
                 fontWeight: FontWeight.w700,
                 fontSize: averageText,
-                color: Colors.black
+                color: Colors.white
               ),
           ),
           subTitleContent(subTitle: 'Flu'),
@@ -53,7 +53,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
           contentText(content: bronkitisText),
           SizedBox(height: Spacing.mediumSpacing),
           Text('Cara Menjaga Organ Pernapasan',
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.left,
             style: Theme.of(context)
               .textTheme
               .headline6!
@@ -61,7 +61,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
                 fontFamily: 'Scada',
                 fontWeight: FontWeight.w700,
                 fontSize: averageText,
-                color: Colors.black
+                color: Colors.white
               ),
           ),
           contentText(content: howToKeepHealthy),
@@ -83,7 +83,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
             fontFamily: 'Scada',
             fontWeight: FontWeight.w700,
             fontSize: smallText,
-            color: Colors.black
+            color: Colors.white
           ),
       ),
     );
@@ -99,7 +99,7 @@ class _RespirationDiseasePageState extends State<RespirationDiseasePage> {
           fontFamily: 'Scada',
           fontWeight: FontWeight.w500,
           fontSize: smallText,
-          color: Colors.black87
+          color: Colors.white
         ),
     );
   }

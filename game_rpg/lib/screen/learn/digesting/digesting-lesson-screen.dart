@@ -137,7 +137,7 @@ class _DigestingLessonScreenState extends State<DigestingLessonScreen> {
                             fontFamily: 'Scada',
                             fontWeight: FontWeight.w800,
                             fontSize: largeText,
-                            color: Colors.black
+                            color: Colors.white
                           ),
                       ),
                     ),
