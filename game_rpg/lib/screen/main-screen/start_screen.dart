@@ -43,12 +43,11 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
 
   @override
   void initState() {
-    imageBG = Image.asset('assets/images/background/splash-bg.jpg');
+    imageBG = Image.asset('assets/images/background/start-screen-bg.jpeg');
     _blinkingAnimationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1250));
     _blinkingAnimationController.repeat(reverse: true);
     Timer(const Duration(seconds: 4), () {
       ProfileController.to.loadStart();
-      // loadStart();
     });
     AudioController.to.playLobbyBgm();
     super.initState();
@@ -91,7 +90,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                   decoration: const BoxDecoration(
                       color: plainBlackBackground,
                       image: DecorationImage(
-                          image: AssetImage('assets/images/background/splash-bg.jpg'),
+                          image: AssetImage('assets/images/background/start-screen-bg.jpeg'),
                           fit: BoxFit.fill
                       )
                   ),

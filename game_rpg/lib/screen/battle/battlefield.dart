@@ -44,13 +44,13 @@ class _BattleFieldState extends State<BattleField> {
 
   @override
   void initState() {
-    BattleFieldController.to.bgSelector();
     imageBG = Image.asset(BattleFieldController.to.imageBG.value);
     actionButton = Image.asset('assets/images/background/wood-platform.png');
     killCountBoard = Image.asset('assets/images/background/wood.jpg');
     actionBoard = Image.asset('assets/images/background/wood-texture.jpg');
     logBg = Image.asset('assets/images/background/scroll-parchment.png');
     BattleFieldController.to.initializeSystem();
+    BattleFieldController.to.bgSelector();
     super.initState();
     
     playBgm();
@@ -97,7 +97,9 @@ class _BattleFieldState extends State<BattleField> {
   @override
   Widget build(BuildContext context) {
     // Get.put(SpecialDialogController(context: context));
-    final SpecialDialogController specialDialogCtrl = Get.put(SpecialDialogController(context: context));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final SpecialDialogController specialDialogCtrl = Get.put(SpecialDialogController(context: context));
+    });
 
     return WillPopScope(
       onWillPop: () async {
@@ -112,6 +114,7 @@ class _BattleFieldState extends State<BattleField> {
                 yesAction: () {
                   // Navigator.popUntil(context, ModalRoute.withName('mainMenuScreen'));
                   Navigator.pop(context);
+                  BattleFieldController.to.inGame.value = false;
                   Navigator.pushNamedAndRemoveUntil(context, 'mainMenuScreen', (route) => route.isFirst);
                 }, 
                 noText: 'Batal',
@@ -143,7 +146,9 @@ class _BattleFieldState extends State<BattleField> {
             fit: BoxFit.fill
           ),
         ),
-        child: Column(
+        child: Stack(
+          children: [
+            Column(
           children: [
             SizedBox(height: Spacing.smallSpacing),
             Row(
@@ -157,8 +162,8 @@ class _BattleFieldState extends State<BattleField> {
                         width: MediaQuery.of(context).size.width * 0.3,
                         padding: EdgeInsets.symmetric(vertical: Spacing.smallSpacing),
                         decoration: BoxDecoration(
-                          color: (BattleFieldController.to.turn.value == 'waiting') ? softGreyColor : (BattleFieldController.to.turn.value == 'player') ? greenColor : redColor,
-                          border: Border.all(color: (BattleFieldController.to.turn.value == 'player') ? Colors.white : Colors.black)
+                          color: (BattleFieldController.to.turn.value == 'waiting') ? softGreyColor : (BattleFieldController.to.turn.value == 'Pemain') ? greenColor : redColor,
+                          border: Border.all(color: (BattleFieldController.to.turn.value == 'Pemain') ? Colors.white : Colors.black)
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -168,7 +173,7 @@ class _BattleFieldState extends State<BattleField> {
                               height: MediaQuery.of(context).size.width * 0.05,
                               child: SvgPicture.asset(BattleFieldController.to.turnIcon.value, fit: BoxFit.fill,),
                             ),
-                            Text('${BattleFieldController.to.turn.value} turn',
+                            Text('Giliran ${BattleFieldController.to.turn.value}',
                               style: Theme.of(context)
                                 .textTheme
                                 .headline6!
@@ -176,7 +181,7 @@ class _BattleFieldState extends State<BattleField> {
                                   fontFamily: 'Scada',
                                   fontSize: smallText,
                                   fontWeight: FontWeight.w500,
-                                  color: (BattleFieldController.to.turn.value == 'player') ? Colors.white : Colors.black
+                                  color: (BattleFieldController.to.turn.value == 'Pemain') ? Colors.white : Colors.black
                                 ),
                             ),
                           ],
@@ -245,6 +250,7 @@ class _BattleFieldState extends State<BattleField> {
                                   yesAction: () {
                                     // Navigator.popUntil(context, ModalRoute.withName('mainMenuScreen'));
                                     Navigator.pop(context);
+                                    BattleFieldController.to.inGame.value = false;
                                     Navigator.pushNamedAndRemoveUntil(context, 'mainMenuScreen', (route) => route.isFirst);
                                   }, 
                                   noText: 'Batal',
@@ -277,36 +283,105 @@ class _BattleFieldState extends State<BattleField> {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () {
-                  showDialog(
-                    barrierDismissible: true,
-                    context: context, 
-                    builder: (context) {
-                      return const BattleLog();
-                    }
-                  );
+                  // showDialog(
+                  //   barrierDismissible: true,
+                  //   context: context, 
+                  //   builder: (context) {
+                  //     return const BattleLog();
+                  //   }
+                  // );
+                  var page = '';
+                  if(BattleFieldController.to.storyRound.value <= 5){
+                    page = 'respirationLesson';
+                  }else if(BattleFieldController.to.storyRound.value >= 6 && BattleFieldController.to.storyRound.value <= 10){
+                    page = 'digestingLesson';
+                  }else if(BattleFieldController.to.storyRound.value >= 11 && BattleFieldController.to.storyRound.value <= 15){
+                    page = 'immuneSystemLesson';
+                  }else{
+                    page = 'lessonMainMenu';
+                  }
+                  Navigator.pushNamed(context, page);
                 },
-                child: Container(
-                  margin: EdgeInsets.only(right: Spacing.smallSpacing),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                  height: MediaQuery.of(context).size.width * 0.1,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1),
-                    borderRadius: BorderRadius.circular(5)
-                  ),
-                  child: SvgPicture.asset('assets/icons/log-icon.svg', fit: BoxFit.fill),
-                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(right: Spacing.smallSpacing),
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      height: MediaQuery.of(context).size.width * 0.1,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 1),
+                        borderRadius: BorderRadius.circular(5)
+                      ),
+                      child: SvgPicture.asset('assets/icons/log-icon.svg', fit: BoxFit.fill),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      color: Colors.black38,
+                      child: Text('Pelajari\nMateri',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                          .textTheme
+                          .headline6!
+                          .copyWith(
+                            fontFamily: 'Scada',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Colors.white
+                          ),
+                      ),
+                    )
+                  ],
+                )
               ),
             ),
             const Spacer(flex: 2),
             Obx(() => (BattleFieldController.to.enemyActive.value)
             ? Center(
-              child: Obx(() => SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: MediaQuery.of(context).size.height * 0.25,
+              child: Obx(() => Container(
+                width: 
+                // (EnemyController.to.enemyPassive.value == 'normal') ? MediaQuery.of(context).size.width * 0.5 : 
+                MediaQuery.of(context).size.width,
+                height: (EnemyController.to.enemyAnimated.value == 'yes') ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.25,
                 // color: Colors.blue,
                 child: Column(
                   children: [
-                    Container(
+                    (EnemyController.to.enemyAnimated.value == 'yes')
+                    ? Stack(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          child: Lottie.asset((EnemyController.to.enemyHealth.value > EnemyController.to.enemyLowHealth.value && EnemyController.to.enemyHealth.value != 0)
+                            ? EnemyController.to.healthyAnimation.value
+                            : EnemyController.to.lowAnimation.value,
+                        )),
+                        Center(
+                          child: Container(
+                            child: (BattleFieldController.to.showAttackAnimation.value)
+                            ? SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.45,
+                              height: MediaQuery.of(context).size.height * 0.2,
+                              child: Lottie.asset(CharacterController.to.playerAtkEffect.value, fit: BoxFit.fill),
+                            )
+                            : null,
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            child: (BattleFieldController.to.showEnemyAnimation.value)
+                            ? SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.45,
+                              height: MediaQuery.of(context).size.height * 0.2,
+                              child: Lottie.asset(BattleFieldController.to.effectAnimation.value, fit: BoxFit.fill),
+                            )
+                            : null,
+                          ),
+                        ),
+                      ],
+                    )
+                    : Container(
                       width: (EnemyController.to.enemyPassive.value == 'normal') ? MediaQuery.of(context).size.width * 0.45 : MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.2,
                       decoration: BoxDecoration(
@@ -324,6 +399,7 @@ class _BattleFieldState extends State<BattleField> {
                         : null,
                     ),
                     Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
                       decoration: BoxDecoration(
                         color: Colors.white54,
                         border: Border.all(color: Colors.black45)
@@ -441,7 +517,31 @@ class _BattleFieldState extends State<BattleField> {
                                   shape: BoxShape.circle
                                 ),
                               ),
-                            )
+                            ),
+                            if(CharacterController.to.playerMissed.value)
+                            Opacity(
+                              opacity: 0.7,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.width * 0.2,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle
+                                ),
+                              ),
+                            ),
+                            if(CharacterController.to.playerDebuffed.value)
+                            Opacity(
+                              opacity: 0.7,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.width * 0.2,
+                                decoration: const BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle
+                                ),
+                              ),
+                            ),
                           ],
                         )),
                         Obx(() => SizedBox(
@@ -510,6 +610,7 @@ class _BattleFieldState extends State<BattleField> {
                               ActionButton(
                                 title: 'Mulai', 
                                 onPress: () {
+                                  BattleFieldController.to.stageCountController(BattleFieldController.to.storyRound.value);
                                   if(!BattleFieldController.to.enemyActive.value){
                                     // BattleFieldController.to.enemyLvl1Generate();
                                     BattleFieldController.to.enemyActive.value = true;
@@ -533,7 +634,7 @@ class _BattleFieldState extends State<BattleField> {
                               )
                             ]
                           )
-                        : (BattleFieldController.to.turn.value == 'player')
+                        : (BattleFieldController.to.turn.value == 'Pemain')
                           ? Column(
                             children: [
                               Row(
@@ -571,7 +672,7 @@ class _BattleFieldState extends State<BattleField> {
                                                             decoration: BoxDecoration(
                                                               color: Colors.yellow.shade700,
                                                               // border: Border(bottom: BorderSide(color: plainBlackBackground, width: 1)),
-                                                              borderRadius: BorderRadius.only(
+                                                              borderRadius: const BorderRadius.only(
                                                                 topLeft: Radius.circular(8),
                                                                 topRight: Radius.circular(8)
                                                               )
@@ -681,6 +782,14 @@ class _BattleFieldState extends State<BattleField> {
             ),
           ],
         ),
+        if(BattleFieldController.to.showPlayerAnimation.value)
+        Obx(() => Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: BattleFieldController.to.colorEffect.value.withOpacity(0.2),
+        ))
+          ],
+        )
       ));
     }else{
       return Container(

@@ -81,7 +81,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
 
   @override
   void initState() {
-    imageBG = Image.asset('assets/images/background/main-screen-bg.png');
+    imageBG = Image.asset('assets/images/background/back-up-bg.jpeg');
     startMainMenuSystem();
     super.initState();
   }
@@ -116,7 +116,7 @@ class _MainMenuScreenState extends State<MainMenuScreen>{
         decoration: const BoxDecoration(
           color: plainBlackBackground,
           image: DecorationImage(
-            image: AssetImage('assets/images/background/main-screen-bg.png'),
+            image: AssetImage('assets/images/background/back-up-bg.jpeg'),
             fit: BoxFit.fill
           )
         ),

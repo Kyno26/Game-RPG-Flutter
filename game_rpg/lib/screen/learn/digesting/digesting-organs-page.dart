@@ -104,7 +104,10 @@ class _DigestingOrgansPageState extends State<DigestingOrgansPage> {
                 section3 = true;
               });
             }, 
-            boolVar: section3
+            boolVar: section3,
+            imageExist: true,
+            imageSquare: false,
+            image: 'assets/images/material/lambung.png',
           ),
           SizedBox(height: Spacing.mediumSpacing),
           CustomExpandBtn(
@@ -176,7 +179,10 @@ class _DigestingOrgansPageState extends State<DigestingOrgansPage> {
                 section6 = true;
               });
             }, 
-            boolVar: section6
+            boolVar: section6,
+            imageExist: true,
+            imageSquare: false,
+            image: 'assets/images/material/usus-halus.jpg',
           ),
           SizedBox(height: Spacing.mediumSpacing),
           CustomExpandBtn(
@@ -200,7 +206,10 @@ class _DigestingOrgansPageState extends State<DigestingOrgansPage> {
                 section7 = true;
               });
             }, 
-            boolVar: section7
+            boolVar: section7,
+            imageExist: true,
+            imageSquare: false,
+            image: 'assets/images/material/usus-besar.jpg',
           ),
           SizedBox(height: Spacing.mediumSpacing),
           CustomExpandBtn(

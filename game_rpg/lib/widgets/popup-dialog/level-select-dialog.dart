@@ -18,7 +18,7 @@ class LevelSelectDialog extends StatefulWidget{
 }
 
 class _LevelSelectDialogState extends State<LevelSelectDialog> {
-  int selected = 0;
+  int selected = 1;
   bool stage1 = true;
   bool stage2 = false;
   bool stage3 = false;
@@ -158,9 +158,11 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                         def: CharacterController.to.selectedCharacterDefense.value, 
                         spd: CharacterController.to.selectedCharacterSpeed.value, 
                         acc: CharacterController.to.selectedCharacterAccuracy.value, 
-                        crit: CharacterController.to.selectedCharacterCritRate.value
+                        crit: CharacterController.to.selectedCharacterCritRate.value,
+                        atkEffect: CharacterController.to.selectedCharacterAtkEffect.value
                       );
                       BattleFieldController.to.storyRound.value = stageSelected;
+                      BattleFieldController.to.stageCountController(BattleFieldController.to.storyRound.value);
 
                       Navigator.pop(context);
                       BattleFieldController.to.resetBattlegroundData(stage: BattleFieldController.to.storyRound.value);
@@ -174,8 +176,8 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                         ItemController.to.addItem(itemID: 5);
 
                       }else if(BattleFieldController.to.storyRound.value == 11){
-                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
-                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 20;
+                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 20;
 
                         ItemController.to.addItem(itemID: 1);
                         ItemController.to.addItem(itemID: 2);
@@ -183,8 +185,8 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                         ItemController.to.addItem(itemID: 11);
 
                       }else if(BattleFieldController.to.storyRound.value == 16){
-                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 15;
-                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 15;
+                        CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 35;
+                        CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 35;
 
                         ItemController.to.addItem(itemID: 6);
                         ItemController.to.addItem(itemID: 1);
@@ -197,7 +199,7 @@ class _LevelSelectDialogState extends State<LevelSelectDialog> {
                     }
                   }, 
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: Spacing.smallSpacing),
+                    padding: EdgeInsets.symmetric(horizontal: Spacing.smallSpacing, vertical: 8),
                     backgroundColor: (selected != 0) ? Colors.green : Colors.white,
                     fixedSize: Size.fromWidth(MediaQuery.of(context).size.width * 0.3),
                     shape: RoundedRectangleBorder(

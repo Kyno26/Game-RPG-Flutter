@@ -27,6 +27,17 @@ class _AboutImmuneSystemPageState extends State<AboutImmuneSystemPage> {
         children: [
           const SubTitleContent(subTitle: 'Tentang Sistem Pertahanan Tubuh'),
           SizedBox(height: Spacing.smallSpacing),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: MediaQuery.of(context).size.width * 0.35,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/material/bagan-sistem-imun.png'),
+                fit: BoxFit.fill
+              )
+            ),
+          ),
+          SizedBox(height: Spacing.smallSpacing),
           const ContentText(content: immuneSystemAbout),
           SizedBox(height: Spacing.mediumSpacing),
         ],

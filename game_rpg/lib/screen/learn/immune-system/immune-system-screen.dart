@@ -8,6 +8,7 @@ import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/immune-text.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/screen/learn/immune-system/about-immune-system-page.dart';
 import 'package:game_rpg/screen/learn/immune-system/immune-disease-page.dart';
 import 'package:game_rpg/screen/learn/immune-system/immune-nonspecific-page.dart';
@@ -94,7 +95,7 @@ class _ImmuneSystemScreenState extends State<ImmuneSystemScreen> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
+                    width: (BattleFieldController.to.inGame.value) ? MediaQuery.of(context).size.width * 0.85 : MediaQuery.of(context).size.width * 0.7,
                     child: Center(
                       child: Text('Sistem Pertahanan Tubuh',
                         style: Theme.of(context)
@@ -109,6 +110,7 @@ class _ImmuneSystemScreenState extends State<ImmuneSystemScreen> {
                       ),
                     ),
                   ),
+                  if(!BattleFieldController.to.inGame.value)
                   GestureDetector(
                     onTap: () {
                       Navigator.popUntil(context, ModalRoute.withName('mainMenuScreen'));
@@ -141,6 +143,14 @@ class _ImmuneSystemScreenState extends State<ImmuneSystemScreen> {
                             fontSize: largeText,
                             color: Colors.white
                           ),
+                      ),
+                    ),
+                    SizedBox(height: Spacing.mediumSpacing),
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        height: MediaQuery.of(context).size.width * 0.6,
+                        child: Image.asset('assets/images/material/sistem-imun.jpg', fit: BoxFit.fill,),
                       ),
                     ),
                     SizedBox(height: Spacing.mediumSpacing),

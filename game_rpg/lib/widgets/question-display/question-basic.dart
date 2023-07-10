@@ -282,7 +282,7 @@ class _QuestionBasicState extends State<QuestionBasic> {
                     fontFamily: 'Scada',
                     fontWeight: FontWeight.w700,
                     fontSize: averageText,
-                    color: (QuestionController.to.curTime.value > 5) ? Colors.black : Colors.orange
+                    color: (QuestionController.to.curTime.value > 5) ? Colors.black : Colors.orange.shade600
                   ),
               ),
             ],

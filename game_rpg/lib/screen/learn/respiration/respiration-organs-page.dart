@@ -66,7 +66,9 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ1 = true;
                 });
               }
-            }),
+            }, 
+            imageExist: false
+          ),
           SizedBox(height: Spacing.smallSpacing),
           CustomExpandBtn(
             title: 'Faring', 
@@ -90,7 +92,9 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ2 = true;
                 });
               }
-            }),
+            },
+            imageExist: false
+          ),
           SizedBox(height: Spacing.smallSpacing),
           CustomExpandBtn(
             title: 'Trakea', 
@@ -114,7 +118,11 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ3 = true;
                 });
               }
-            }),
+            },
+            imageExist: true,
+            square: true,
+            image: 'assets/images/material/trakea.jpg'
+          ),
           SizedBox(height: Spacing.smallSpacing),
           CustomExpandBtn(
             title: 'Laring', 
@@ -138,7 +146,9 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ4 = true;
                 });
               }
-            }),
+            },
+            imageExist: false
+          ),
           SizedBox(height: Spacing.smallSpacing),
           CustomExpandBtn(
             title: 'Bronkus', 
@@ -162,7 +172,9 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ5 = true;
                 });
               }
-            }),
+            },
+            imageExist: false
+          ),
           SizedBox(height: Spacing.smallSpacing),
           CustomExpandBtn(
             title: 'Paru-paru', 
@@ -186,14 +198,18 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
                   organ6 = true;
                 });
               }
-            }),
+            },
+            imageExist: true,
+            square: false,
+            image: 'assets/images/material/paru-paru.jpg'
+          ),
           SizedBox(height: Spacing.smallSpacing),
         ],
       ),
     );
   }
 
-  Widget infoSection({required bool whichOrgan, required String content, required Function() openSection}){
+  Widget infoSection({required bool whichOrgan, required String content, required Function() openSection, required bool imageExist, bool? square, String? image}){
     if (whichOrgan) {
       return Container(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -206,18 +222,34 @@ class _RespirationOrganPageState extends State<RespirationOrganPage> {
             bottom: BorderSide(color: Colors.black45, width: 2),
           )
         ),
-        child:  Text(content,
-          textAlign: TextAlign.justify,
-          style: Theme.of(context)
-            .textTheme
-            .headline6!
-            .copyWith(
-              fontFamily: 'Scada',
-              fontWeight: FontWeight.w500,
-              fontSize: smallText,
-              color: Colors.black87
+        child:  Column(
+          children: [
+            if(imageExist)
+            Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              height: (square == true) ? MediaQuery.of(context).size.width * 0.6 : MediaQuery.of(context).size.width * 0.35,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(image.toString()),
+                  fit: BoxFit.fill
+                )
+              ),
             ),
-          )
+            SizedBox(height: Spacing.smallSpacing),
+            Text(content,
+              textAlign: TextAlign.justify,
+              style: Theme.of(context)
+                .textTheme
+                .headline6!
+                .copyWith(
+                  fontFamily: 'Scada',
+                  fontWeight: FontWeight.w500,
+                  fontSize: smallText,
+                  color: Colors.black87
+                ),
+            )
+          ],
+        )
       );
     } else {
       return GestureDetector(

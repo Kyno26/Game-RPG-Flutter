@@ -37,7 +37,7 @@ class _SplashSreenState extends State<SplashSreen> {
         return exitApp;
       },
       child: Scaffold(
-        backgroundColor: plainBlackBackground,
+        backgroundColor: Colors.white,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,7 +54,7 @@ class _SplashSreenState extends State<SplashSreen> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.35,
                         height: MediaQuery.of(context).size.width * 0.35,
-                        child: SvgPicture.asset('assets/icons/info-icon-large.svg', fit: BoxFit.fill, color: Colors.grey.shade300),
+                        child: SvgPicture.asset('assets/icons/info-icon-large.svg', fit: BoxFit.fill, color: Colors.black87),
                       ),
                       SizedBox(height: Spacing.largeSpacing * 2),
                       Text('Semua asset seperti gambar dan audio di dalam game bukan milik pengembang, kesamaan nama merupakan kebetulan',
@@ -66,7 +66,7 @@ class _SplashSreenState extends State<SplashSreen> {
                             fontFamily: 'Scada',
                             fontSize: smallText,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white70,
+                            color: Colors.black,
                           ),
                       ),
                       SizedBox(height: Spacing.mediumSpacing),
@@ -79,7 +79,7 @@ class _SplashSreenState extends State<SplashSreen> {
                             fontFamily: 'Scada',
                             fontSize: smallText,
                             fontWeight: FontWeight.w900,
-                            color: Colors.yellow,
+                            color: Colors.orange,
                           ),
                       ),
                     ],

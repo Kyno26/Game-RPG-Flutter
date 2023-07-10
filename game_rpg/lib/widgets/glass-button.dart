@@ -73,7 +73,7 @@ class GlassButton extends StatelessWidget{
                           fontFamily: 'Scada',
                           fontSize: 9,
                           fontWeight: FontWeight.w400,
-                          color: (redSubtitle) ? softRedColor : softGreyColor
+                          color: (redSubtitle) ? softRedColor : Colors.white
                         ),
                     ),
                   ),

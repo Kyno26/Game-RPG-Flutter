@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:lottie/lottie.dart';
 
 class LessonMainMenu extends StatefulWidget{
@@ -87,7 +88,7 @@ class _LessonMainMenuState extends State<LessonMainMenu> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
+                    width: (BattleFieldController.to.inGame.value) ? MediaQuery.of(context).size.width * 0.85 : MediaQuery.of(context).size.width * 0.7,
                     child: Center(
                       child: Text('Pilih Materi',
                         style: Theme.of(context)
@@ -102,6 +103,7 @@ class _LessonMainMenuState extends State<LessonMainMenu> {
                       ),
                     ),
                   ),
+                  if(!BattleFieldController.to.inGame.value)
                   GestureDetector(
                     onTap: () {
                       Navigator.popUntil(context, ModalRoute.withName('mainMenuScreen'));

@@ -11,6 +11,10 @@ class Enemy {
   late final String defAction;
   late final String actionList;
   late final String? passiveList;
+  late final String animated;
+  late final String healthy;
+  late final String low;
+  late final int lowHealth;
   // late final String skillName;
   // late final String skillDesc;
 
@@ -29,6 +33,10 @@ class Enemy {
     required this.defAction,
     required this.actionList,
     required this.passiveList,
+    required this.animated,
+    required this.healthy,
+    required this.low,
+    required this.lowHealth,
     // required this.skillName,
     // required this.skillDesc,
   });
@@ -46,7 +54,11 @@ class Enemy {
       image: json['image'],
       defAction: json['def_act'],
       actionList: json['action_list'],
-      passiveList: json['passive'],
+      passiveList: json['size'],
+      animated: json['animated'],
+      healthy: json['healthy'],
+      low: json['low'],
+      lowHealth: json['low_health'],
       // skillName: json['skill_name'],
       // skillDesc: json['skill_desc'],
     );
@@ -64,7 +76,11 @@ class Enemy {
     'image': image,
     'def_action': defAction,
     'action_list': actionList,
-    'passive': passiveList,
+    'size': passiveList,
+    'animated': animated,
+    'healthy': healthy,
+    'low': low,
+    'low_health': lowHealth,
     // 'skill_name': skillName,
     // 'skill_desc': skillDesc,
   };

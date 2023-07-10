@@ -51,7 +51,8 @@ class _SelectCharacterBoxState extends State<SelectCharacterBox>{
             characterAcc: widget.character.acc,
             characterCrit: widget.character.crit,
             characterImage: widget.character.imageFull,
-            characterPotrait: widget.character.imageUnlocked,
+            characterPotrait: widget.character.imageUnlocked, 
+            atkEffect: widget.character.attackEffect,
           );
         // }
       },

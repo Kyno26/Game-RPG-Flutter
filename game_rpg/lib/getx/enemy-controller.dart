@@ -5,12 +5,14 @@ import 'dart:math';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:game_rpg/component/databaseSQLite/db-manager.dart';
 import 'package:game_rpg/getx/audio-controller.dart';
 import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/character-controller.dart';
 import 'package:game_rpg/getx/item-controller.dart';
 import 'package:game_rpg/getx/question-controller.dart';
+import 'package:game_rpg/getx/special-dialog-controller.dart';
 import 'package:get/get.dart';
 
 class EnemyController extends GetxController{
@@ -28,6 +30,11 @@ class EnemyController extends GetxController{
   RxInt enemyCrit = 0.obs;
   RxString rawActionList = ''.obs;
 
+  RxString enemyAnimated = 'no'.obs;
+  RxString healthyAnimation = ''.obs;
+  RxString lowAnimation = ''.obs;
+  RxInt enemyLowHealth = 0.obs;
+
   RxInt enemyID = 0.obs;
 
   RxString enemyPassive = ''.obs;
@@ -39,6 +46,8 @@ class EnemyController extends GetxController{
   RxBool poisonOn = false.obs;
   RxBool gasOn = false.obs;
   RxBool burnOn = false.obs;
+
+  RxBool showPlayerAttackedAnimation = false.obs;
 
   RxInt maxPoisonDuration = 3.obs;
   RxInt curPoisonDuration = 0.obs;
@@ -67,10 +76,10 @@ class EnemyController extends GetxController{
         enemyID.value = 3;
         break;
       case 6:
-        enemyID.value = 4;
+        enemyID.value = 6;
         break;
       case 7:
-        enemyID.value = 4;
+        enemyID.value = 6;
         break;
       case 8:
         enemyID.value = 3;
@@ -158,10 +167,18 @@ class EnemyController extends GetxController{
       enemyDefendAct.value = res.defAction;
       rawActionList.value = res.actionList;
       enemyPassive.value = res.passiveList ?? '';
+      enemyAnimated.value = res.animated;
+      healthyAnimation.value = res.healthy;
+      lowAnimation.value = res.low;
+      enemyLowHealth.value = res.lowHealth;
       // if(enemyPassive.value != ''){
       //   enemyPassiveList = json.decode(enemyPassive.value).cast<String>().toList();
       // }
-      BattleFieldController.to.turn.value = 'waiting';
+      print('enemy size: ${enemyPassive.value}');
+      print('===== enemy data =====');
+      print(res);
+      print('======================');
+      BattleFieldController.to.turn.value = 'Pemain';
       BattleFieldController.to.turnIcon.value = 'assets/icons/waiting-icon.svg';
       BattleFieldController.to.questionPhase.value = false;
       BattleFieldController.to.startBattle.value = false;
@@ -186,45 +203,76 @@ class EnemyController extends GetxController{
           case 'attack':
             var attRes = await BattleFieldController.to.dodgeChance(spd: CharacterController.to.playerSpd.value, acc: enemyAcc.value, defender: CharacterController.to.playerName.value, attacker: 'enemy');
             if(attRes == 'HIT'){
+              BattleFieldController.to.colorEffect.value = Colors.red;
               BattleFieldController.to.countDmgReceived(atk: enemyAtk.value, def: CharacterController.to.playerDef.value, hp: CharacterController.to.playerHealth, maxHp: CharacterController.to.playerMaxHealth.value, critRate: enemyCrit.value, attacker: enemyName.value, defender: CharacterController.to.playerName.value, attackerHp: enemyHealth);
+            }else{
+              BattleFieldController.to.colorEffect.value = Colors.white;
+              CharacterController.to.playerMissed.value = true;
+              Timer(const Duration(seconds: 1), (){
+                CharacterController.to.playerMissed.value = false;
+              });
             }
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+                EnemyController.to.showPlayerAttackedAnimation.value = false;
+            });
             break;
           case 'defend':
             BattleFieldController.to.addBuff(buff: enemyDefendAct.value, receiver: 'enemy');
             BattleFieldController.to.addBattleLog(message: 'bertahan', type: 'DEFEND', defender: enemyName.value);
             break;
           case 'camouflage':
-            //code
             camouflageOn.value = true;
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} menggunakan kamuflase', type: 'FREE');
             break;
           case 'poison':
-            //code
             poisonOn.value = true;
             curPoisonDuration.value = 0;
+            BattleFieldController.to.colorEffect.value = Colors.blue;
             if(!poisonOn.value){
               CharacterController.to.playerDef.value = CharacterController.to.playerDef.value - 3;
             }
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} meracuni ${CharacterController.to.playerName.value}', type: 'FREE');
             BattleFieldController.to.addBattleLog(message: '${CharacterController.to.playerName.value} akan menerima damage selama 3 ronde dan pertahanan menurun dari efek status negatif', type: 'FREE');
+            CharacterController.to.playerDebuffed.value = true;
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+              CharacterController.to.playerDebuffed.value = false;
+              EnemyController.to.showPlayerAttackedAnimation.value = false;
+              SpecialDialogController.to.showPoisonDebuff();
+            });
             break;
           case 'gas':
             //code
             gasOn.value = true;
             curGasDuration.value = 0;
+            BattleFieldController.to.colorEffect.value = Colors.blue;
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} menyemprotkan gas bau kepada ${CharacterController.to.playerName.value}', type: 'FREE');
             BattleFieldController.to.addBattleLog(message: '${CharacterController.to.playerName.value} tidak dapat menyerang selama 2 giliran akibat dari status negatif', type: 'FREE');
+            CharacterController.to.playerDebuffed.value = true;
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+              CharacterController.to.playerDebuffed.value = false;
+              EnemyController.to.showPlayerAttackedAnimation.value = false;
+              SpecialDialogController.to.showGasDebuff();
+            });
             break;
           case 'double attack':
             //code
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} menggunakan serangan ganda', type: 'FREE');
             var attRes = await BattleFieldController.to.dodgeChance(spd: CharacterController.to.playerSpd.value, acc: enemyAcc.value, defender: CharacterController.to.playerName.value, attacker: 'enemy');
             if(attRes == 'HIT'){
+              BattleFieldController.to.colorEffect.value = Colors.red;
               BattleFieldController.to.countDmgReceived(atk: enemyAtk.value, def: CharacterController.to.playerDef.value, hp: CharacterController.to.playerHealth, maxHp: CharacterController.to.playerMaxHealth.value, critRate: enemyCrit.value, attacker: enemyName.value, defender: CharacterController.to.playerName.value, attackerHp: enemyHealth);
               BattleFieldController.to.countDmgReceived(atk: enemyAtk.value, def: CharacterController.to.playerDef.value, hp: CharacterController.to.playerHealth, maxHp: CharacterController.to.playerMaxHealth.value, critRate: enemyCrit.value, attacker: enemyName.value, defender: CharacterController.to.playerName.value, attackerHp: enemyHealth);
             }else{
+              BattleFieldController.to.colorEffect.value = Colors.white;
               BattleFieldController.to.addBattleLog(message: '${CharacterController.to.playerName.value} berhasil menghindari serangan ganda', type: 'FREE');
             }
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+                EnemyController.to.showPlayerAttackedAnimation.value = false;
+            });
             break;
           case 'suck':
             //code
@@ -233,6 +281,11 @@ class EnemyController extends GetxController{
             if(enemyHealth.value > enemyMaxHealth.value){
               enemyHealth.value = enemyMaxHealth.value;
             }
+            BattleFieldController.to.colorEffect.value = Colors.red;
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+                EnemyController.to.showPlayerAttackedAnimation.value = false;
+            });
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} menghisap nyawa ${CharacterController.to.playerName.value} dan memulihkan HP sebanyak 20 poin', type: 'FREE');
             break;
           case 'burn':
@@ -240,8 +293,16 @@ class EnemyController extends GetxController{
             CharacterController.to.playerHealth.value = CharacterController.to.playerHealth.value - 15;
             burnOn.value = true;
             curBurnDuration.value = 0;
+            BattleFieldController.to.colorEffect.value = Colors.blue;
             BattleFieldController.to.addBattleLog(message: '${enemyName.value} menyerang ${CharacterController.to.playerName.value} menggunakan api dan menerima serangan sebesar 15 poin', type: 'FREE');
             BattleFieldController.to.addBattleLog(message: '${CharacterController.to.playerName.value} akan menerima kerusakan selama 3 ronde dari efek status negatif', type: 'FREE');
+            CharacterController.to.playerDebuffed.value = true;
+            EnemyController.to.showPlayerAttackedAnimation.value = true;
+            Timer(const Duration(seconds: 1), (){
+              EnemyController.to.showPlayerAttackedAnimation.value = false;
+              CharacterController.to.playerDebuffed.value = false;
+              SpecialDialogController.to.showBurnDebuff();
+            });
             break;
           default:
             var attRes = await BattleFieldController.to.dodgeChance(spd: CharacterController.to.playerSpd.value, acc: enemyAcc.value, defender: CharacterController.to.playerName.value, attacker: 'enemy');
@@ -285,7 +346,7 @@ class EnemyController extends GetxController{
 
       Timer(const Duration(seconds: 2), (){
         BattleFieldController.to.turnIcon.value = 'assets/icons/waiting-icon.svg';
-        BattleFieldController.to.turn.value = 'waiting';
+        BattleFieldController.to.turn.value = 'Pemain';
         BattleFieldController.to.battleTurnSystem();
         BattleFieldController.to.startBattle.value = false;
       });

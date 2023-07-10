@@ -42,6 +42,17 @@ class _RespirationProcessPageState extends State<RespirationProcessPage> {
               ),
           ),
           SizedBox(height: Spacing.mediumSpacing),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: MediaQuery.of(context).size.width * 0.35,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/material/mekanisme-inspirasi-dan-ekspirasi.jpg'),
+                fit: BoxFit.fill
+              )
+            ),
+          ),
+          SizedBox(height: Spacing.mediumSpacing),
           CustomExpandBtn(
             title: 'Proses Pernapasan', 
             onPressed: () {

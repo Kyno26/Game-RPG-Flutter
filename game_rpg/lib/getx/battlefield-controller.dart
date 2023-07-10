@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:game_rpg/component/databaseSQLite/db-manager.dart';
 import 'package:game_rpg/component/shared-preferences-data/user-data.dart';
 import 'package:game_rpg/getx/audio-controller.dart';
@@ -21,11 +22,11 @@ import 'package:get/get.dart';
 class BattleFieldController extends GetxController{
   static BattleFieldController get to => Get.find<BattleFieldController>();
 
-  RxString imageBG = ''.obs;
+  RxString imageBG = 'assets/images/background/field-bg.png'.obs;
   RxInt enemyDefeated = 0.obs;
   RxInt storyRound = 1.obs;
   RxInt scorePerQuestion = 0.obs;
-  RxString stageText = ''.obs;
+  RxString stageText = 'Menunggu'.obs;
 
   RxInt playerTurn = 1.obs;
   RxInt enemyTurn = 1.obs;
@@ -44,7 +45,13 @@ class BattleFieldController extends GetxController{
   RxBool showEnemyAnimation = false.obs;
   RxBool showPlayerAnimation = false.obs;
 
+  RxString attackEffect = ''.obs;
+  RxBool showAttackAnimation = false.obs;
+
   RxBool gameFinished = false.obs;
+  RxBool inGame = false.obs;
+
+  var colorEffect = Colors.transparent.obs;
 
   Buff? buffObtained;
   List battleLog = [].obs;
@@ -108,7 +115,7 @@ class BattleFieldController extends GetxController{
 
   initializeSystem() {
     // enemyLvl1Generate();
-    turn.value = 'waiting';
+    turn.value = 'Pemain';
     turnIcon.value = 'assets/icons/waiting-icon.svg';
     questionPhase.value = false;
     startBattle.value = false;
@@ -118,14 +125,20 @@ class BattleFieldController extends GetxController{
     effectAnimation.value = '';
     ProfileController.to.continueGameStatus.value = true;
     QuestionController.to.showAnswer.value = false;
+    inGame.value = true;
     QuestionController.to.showAnimation.value = false;
     // giveUpgradePoint(round: storyRound.value);
     // QuestionController.to.currentScore.value = 0;
     // ShopController.to.coinGetBattle.value = 0;
     // storyRound.value = 1;
     // ItemController.to.generateItem();
-    stageText.value = stageCountController(storyRound.value);
+    // stageCountController(storyRound.value);
     scorePerQuestion.value = questionScoreController(storyRound.value);
+    if(storyRound.value == 6 || storyRound.value == 11 || storyRound.value == 16){
+      Timer(const Duration(seconds: 2), (){
+        SpecialDialogController.to.levelUp(title: 'Pemberitahuan', content: 'Anda mendapatkan ITEM dan POIN UPRGRADE. \n Tingkatkan status anda pada halaman detail karakter');
+      });
+    }
   }
 
   resetBattlegroundData({required int stage}) {
@@ -153,6 +166,9 @@ class BattleFieldController extends GetxController{
     storyRound.value = stage;
     enemyActive.value = false;
     battleLog.clear();
+    inGame.value = false;
+    EnemyController.to.showPlayerAttackedAnimation.value = false;
+    showAttackAnimation.value = false;
     EnemyController.to.enemySpawner();
     QuestionController.to.currentScore.value = 0;
     ShopController.to.coinGetBattle.value = 0;
@@ -223,43 +239,55 @@ class BattleFieldController extends GetxController{
     if(storyRound.value == 6){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+      SpecialDialogController.to.levelUp(title: 'Naik Level', content: 'Selamat anda Naik Level! \nTingkatkan status karakter pada halaman detail karakter anda saat ini');
     }else if(storyRound.value == 11){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 10;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 10;
+      SpecialDialogController.to.levelUp(title: 'Naik Level', content: 'Selamat anda Naik Level! \nTingkatkan status karakter pada halaman detail karakter anda saat ini');
     }else if(storyRound.value == 16){
       CharacterController.to.upgradePointOwned.value = CharacterController.to.upgradePointOwned.value + 15;
       CharacterController.to.upgradePointAvailable.value = CharacterController.to.upgradePointAvailable.value + 15;
+      SpecialDialogController.to.levelUp(title: 'Naik Level', content: 'Selamat anda Naik Level! \nTingkatkan status karakter pada halaman detail karakter anda saat ini');
     }
   }
 
   stageCountController(int round) {
     if(storyRound.value > 0 && storyRound.value <= 5){
-      return stageText.value = '1 - $round';
+      stageText.value = '1 - $round';
     }else if (round >= 6 && round <= 10){
-      return stageText.value = '2 - ${round - 5}';
+      stageText.value = '2 - ${round - 5}';
     }else if (round >= 11 && round <= 15){
-      return stageText.value = '3 - ${round - 10}';
+      stageText.value = '3 - ${round - 10}';
     }else if (round >= 16 && round <= 20){
-      return stageText.value = '4 - ${round - 15}';
+      stageText.value = '4 - ${round - 15}';
     }else {
-      return stageText.value = 'Game Clear';
+      stageText.value = 'Game Clear';
     }
   }
 
   startPlayerTurn() {
-    turn.value = 'player';
+    turn.value = 'Pemain';
     QuestionController.to.getQuestionFromDatabase();
     BattleFieldController.to.questionPhase.value = true;
   }
 
+  resetValueNextLevel(){
+    turn.value = 'Pemain';
+    turnIcon.value = 'assets/icons/waiting-icon.svg';
+    ItemController.to.smokeActive.value = false;
+    ItemController.to.freezeActive.value = false;
+    ItemController.to.burnActive.value = false;
+    enemyActive.value = false;
+    enemyDefeated.value++;
+    playerTurn.value = 1;
+  }
+
   battleTurnSystem() {
     if(CharacterController.to.playerHealth.value > 0){
-      // addBattleLog(message: 'current story stage ${storyRound.value}', type: 'FREE');
       if(EnemyController.to.enemyHealth.value > 0){
-        if(turn.value == 'enemy'){
-          // turnIcon.value = 'assets/icons/enemy-turn-icon.svg';
+        if(turn.value == 'Musuh'){
           enemyAction.value = EnemyController.to.enemyActionRandomizer();
-          print(enemyAction.value);
+          debugPrint(enemyAction.value);
           EnemyController.to.enemyPhase(actionSelected: enemyAction.value);
           enemyTurn.value++;
         }
@@ -269,36 +297,29 @@ class BattleFieldController extends GetxController{
         }else{
         //Enemy Defeated
         addBattleLog(attacker: CharacterController.to.playerName.value, defender: EnemyController.to.enemyName.value, message: 'berhasil mengalahkan', type: 'DEFEAT');
-        turn.value = 'waiting';
-        turnIcon.value = 'assets/icons/waiting-icon.svg';
-        // randomEnemyGenerator();
+        resetValueNextLevel();
+        storyRound.value++;
         EnemyController.to.enemySpawner();
         stageUnlock();
         bgSelector();
-        ItemController.to.smokeActive.value = false;
-        ItemController.to.freezeActive.value = false;
-        ItemController.to.burnActive.value = false;
         giveUpgradePoint(round: storyRound.value);
-        enemyActive.value = false;
-        enemyDefeated.value++;
-        playerTurn.value = 1;
-        storyRound.value++;
-        stageText.value = stageCountController(storyRound.value);
+        stageCountController(storyRound.value);
         scorePerQuestion.value = questionScoreController(storyRound.value);
         QuestionController.to.currentScore.value = QuestionController.to.currentScore.value + 20;
-        ShopController.to.coinGetBattle.value = ShopController.to.coinGetBattle.value + 15;
         SpecialDialogController.to.showitemGetDialog();
         }
       }
     }else{
-      //Player Defeated
+      //Player Defeated Use 2nd Chance Item
       if(ItemController.to.lifeNecklaceOn.value){
         CharacterController.to.playerHealth.value = CharacterController.to.playerMaxHealth.value;
         ItemController.to.removeItemFromItemList(itemID: 9);
         ItemController.to.lifeNecklaceOn.value = false;
+        SpecialDialogController.to.necklaseUsed();
         addBattleLog(message: 'Item Jimat Penyelamat telah digunakan!', type: 'USE ITEM');
-      }else{
+      }else{  //player Defeated
         ProfileController.to.continueGameStatus.value = false;
+        inGame.value = false;
         SpecialDialogController.to.showGameOverDialog();
       }
     }
@@ -322,7 +343,7 @@ class BattleFieldController extends GetxController{
       critChanceContainer.add('NORMAL HIT');
     }
 
-    effectAnimation.value = 'assets/images/lottie/hit-effect.json';
+    effectAnimation.value = 'assets/images/lottie/normal-hit.json';
 
     var critResult = Random().nextInt(critChanceContainer.length);
     if (kDebugMode) {
@@ -333,7 +354,7 @@ class BattleFieldController extends GetxController{
       if (kDebugMode) {
         debugPrint('normal dmg: $tempDmg');
       }
-      effectAnimation.value = 'assets/images/lottie/critical-hit-effect.json';
+      effectAnimation.value = 'assets/images/lottie/critical-hit.json';
       dmg  = tempDmg * 2;
     }
     
@@ -351,8 +372,9 @@ class BattleFieldController extends GetxController{
 
     debugPrint('Attacker: ${turn.value}');
     //Attack Animation
-    if(turn.value == 'player'){
+    if(turn.value == 'Pemain'){
       showEnemyAnimation.value = true;
+      showAttackAnimation.value = true;
       if(critChanceContainer[critResult] == 'NORMAL HIT'){
         AudioController.to.playNormalAtkBGM();
       }else{
@@ -360,6 +382,7 @@ class BattleFieldController extends GetxController{
       }
       Timer(const Duration(seconds: 1), (){
         showEnemyAnimation.value = false;
+        showAttackAnimation.value = false;
       });
     }else{
       showPlayerAnimation.value = true;
@@ -381,7 +404,7 @@ class BattleFieldController extends GetxController{
   }
 
   countItemDMG({required int dmgDealt}) {
-    effectAnimation.value = 'assets/images/lottie/hit-effect.json';
+    effectAnimation.value = 'assets/images/lottie/normal-hit.json';
 
     EnemyController.to.enemyHealth.value = EnemyController.to.enemyHealth.value - dmgDealt;
     if(EnemyController.to.enemyHealth.value < 0){
@@ -413,10 +436,10 @@ class BattleFieldController extends GetxController{
         if(countRate > 10){
           hitRate++;
         }
-      }else if(countRate < 1){
+      }else if(countRate < -5){
         hitRate = 2;
         missRate = 3;
-      }else if(countRate >= 1 && countRate <= 15){
+      }else if(countRate >= -5 && countRate <= 15){
         hitRate = 3;
         missRate = 2;
       }else if(countRate > 15){
@@ -466,12 +489,14 @@ class BattleFieldController extends GetxController{
     }
     if(dodgeRate[attResult] == 'MISS'){
       addBattleLog(defender: '$defender', message: 'berhasil menghindari serangan', type: 'DODGE');
-      effectAnimation.value = 'assets/images/lottie/miss-effect.json';
+      effectAnimation.value = 'assets/images/lottie/miss.json';
       
-      if(turn.value == 'player'){
+      if(turn.value == 'Pemain'){
         showEnemyAnimation.value = true;
+        showAttackAnimation.value = true;
         Timer(const Duration(seconds: 1), (){
           showEnemyAnimation.value = false;
+          showAttackAnimation.value = false;
         });
       }else{
         showPlayerAnimation.value = true;

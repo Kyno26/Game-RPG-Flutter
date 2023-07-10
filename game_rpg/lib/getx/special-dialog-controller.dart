@@ -5,7 +5,9 @@ import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/getx/question-controller.dart';
 import 'package:game_rpg/getx/shop-controller.dart';
 import 'package:game_rpg/widgets/popup-dialog/game-over-dialog.dart';
+import 'package:game_rpg/widgets/popup-dialog/get-debuff-dialog.dart';
 import 'package:game_rpg/widgets/popup-dialog/get-item-dialog.dart';
+import 'package:game_rpg/widgets/popup-dialog/level-up-dialog.dart';
 import 'package:get/get.dart';
 
 class SpecialDialogController extends GetxController{
@@ -47,6 +49,81 @@ class SpecialDialogController extends GetxController{
               return false;
             },
             child: const GetItemDialog() 
+          );
+        }
+      );
+    });
+  }
+
+  void showPoisonDebuff() {
+    Future.delayed(Duration.zero, (){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return GetDebuffDialog(
+            title: 'Efek Negatif', 
+            content: 'Anda terkena racun, pertahanan anda menurun dan menerima 5 damage selama beberapa giliran', 
+            onPress: () => Navigator.pop(context)
+          );
+        }
+      );
+    });
+  }
+
+  void showBurnDebuff() {
+    Future.delayed(Duration.zero, (){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return GetDebuffDialog(
+            title: 'Efek Negatif', 
+            content: 'Anda terkena semburan api, anda akan menerima 5 damage selama beberapa giliran', 
+            onPress: () => Navigator.pop(context)
+          );
+        }
+      );
+    });
+  }
+
+  void showGasDebuff() {
+    Future.delayed(Duration.zero, (){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return GetDebuffDialog(
+            title: 'Efek Negatif', 
+            content: 'Anda terkena semprotan gas, anda tidak dapat menyerang selama 2 giliran', 
+            onPress: () => Navigator.pop(context)
+          );
+        }
+      );
+    });
+  }
+
+  void levelUp({required String title, required String content}) {
+    Future.delayed(Duration.zero, (){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return LevelUpDialog(
+            title: title, 
+            content: content, 
+            onPress: () => Navigator.pop(context)
+          );
+        }
+      );
+    });
+  }
+
+  void necklaseUsed() {
+    Future.delayed(Duration.zero, (){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return LevelUpDialog(
+            title: 'Kesempatan Kedua', 
+            content: 'Item Jimat Penyelamat digunakan, nyawa dipulihkan seperti semula!', 
+            onPress: () => Navigator.pop(context)
           );
         }
       );

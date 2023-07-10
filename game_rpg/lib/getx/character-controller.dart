@@ -27,6 +27,7 @@ class CharacterController extends GetxController{
   RxInt selectedCharacterCritRate = 0.obs;
   RxString selectedCharacterImage = ''.obs;
   RxString selectedCharacterPotraitImage = ''.obs;
+  RxString selectedCharacterAtkEffect = ''.obs;
   //=======================================
 
 
@@ -54,8 +55,11 @@ class CharacterController extends GetxController{
   RxInt playerSpd = 0.obs;
   RxInt playerAcc = 0.obs;
   RxInt playerCrit = 0.obs;
+  RxString playerAtkEffect = ''.obs;
 
   RxBool playerHit = false.obs;
+  RxBool playerMissed = false.obs;
+  RxBool playerDebuffed = false.obs;
 
   RxInt maxBagCapacity = 10.obs;
   RxInt upgradePointAvailable = 10.obs;
@@ -109,6 +113,7 @@ class CharacterController extends GetxController{
     required int characterCrit,
     required String characterImage,
     required String characterPotrait,
+    required String atkEffect,
   }) {
     selected.value = true;
     selectedCharacterId.value = characterId;
@@ -121,9 +126,10 @@ class CharacterController extends GetxController{
     selectedCharacterCritRate.value = characterCrit;
     selectedCharacterImage.value = characterImage;
     selectedCharacterPotraitImage.value = characterPotrait;
+    selectedCharacterAtkEffect.value = atkEffect;
   }
 
-  selectCharacter({required String name, required String image, required int hp, required int atk, required int def, required int spd, required int acc, required int crit,}) {
+  selectCharacter({required String name, required String image, required int hp, required int atk, required int def, required int spd, required int acc, required int crit, required String atkEffect}) {
     playerName.value = name;
     playerCharacterImage.value = image;
     playerMaxHealth.value = hp;
@@ -133,6 +139,8 @@ class CharacterController extends GetxController{
     playerSpd.value = spd;
     playerAcc.value = acc;
     playerCrit.value = crit;
+
+    playerAtkEffect.value = atkEffect;
 
     basePlayerMaxHealth.value = hp;
     basePlayerAtk.value = atk;
@@ -180,12 +188,14 @@ class CharacterController extends GetxController{
   }
 
   upgradePlayerStatus(){
+    //mendapatkan jumlah alokasi poin
     var pointHp = curPlayerMaxHealth.value - basePlayerMaxHealth.value;
     var pointAtk = curPlayerAtk.value - basePlayerAtk.value;
     var pointDef = curPlayerDef.value - basePlayerDef.value;
     var pointSpd = curPlayerSpd.value - basePlayerSpd.value;
     var pointAcc = curPlayerAcc.value - basePlayerAcc.value;
 
+    //meningkatkan status pemain
     try {
       playerMaxHealth.value = playerMaxHealth.value + pointHp;
       playerHealth.value = playerHealth.value + pointHp;
@@ -200,6 +210,7 @@ class CharacterController extends GetxController{
       basePlayerSpd.value = curPlayerSpd.value;
       basePlayerAcc.value = curPlayerAcc.value;
 
+      //memperbarui jumlah poin upgrade yang dimiliki
       var pointUsed = pointHp + pointAtk + pointDef + pointSpd + pointAcc;
       upgradePointOwned.value = upgradePointOwned.value - pointUsed;
       upgradePointAvailable.value = upgradePointOwned.value;
@@ -210,31 +221,34 @@ class CharacterController extends GetxController{
 
 
   playerPhase({required String actionSelected, String? buffName}) async {
-    if(BattleFieldController.to.turn.value == 'player'){
+    if(BattleFieldController.to.turn.value == 'Pemain'){
       if (kDebugMode) {
         debugPrint('Player Turn: ${BattleFieldController.to.playerTurn.value}');
         debugPrint('===== PLAYER PHASE =====');
       }
       switch (actionSelected) {
         case 'Attack':
+          //mengecek kemungkinan serangan berhasil
           var attRes = await BattleFieldController.to.dodgeChance(spd: EnemyController.to.enemySpd.value, acc: playerAcc.value, defender: EnemyController.to.enemyName.value, attacker: 'player', defenderPassiveSkill: EnemyController.to.enemyPassiveList);
+          //jika serangan berhasil menghitung kerusakan yang diberikan
           if(attRes == 'HIT' || ItemController.to.freezeActive.value){
             BattleFieldController.to.countDmgReceived(atk: CharacterController.to.playerAtk.value, def: EnemyController.to.enemyDef.value, hp: EnemyController.to.enemyHealth, maxHp: EnemyController.to.enemyMaxHealth.value, critRate: playerCrit.value, attacker: playerName.value, defender: EnemyController.to.enemyName.value, attackerHp: playerHealth);
-            // AudioController.to.playNormalAtkBGM();
           }
           break;
         case 'Defend':
+          //meningkatkan pertahanan sebesar 5 poin
           BattleFieldController.to.addBuff(buff: buffName!, receiver: 'player');
           BattleFieldController.to.addBattleLog(message: ' bertahan', type: 'DEFEND', defender: playerName.value);
           break;
         case 'Use Item':
+          //menggunakan item yang dipilih
           ItemController.to.useItem(itemID: selectedItemID.value);
           break;
         default:
       }
       BattleFieldController.to.removePlayerBuffEffect();
       EnemyController.to.checkDebuff();
-      BattleFieldController.to.turn.value = 'enemy';
+      BattleFieldController.to.turn.value = 'Musuh';
       debugPrint('===== END OF PLAYER PHASE =====');
       Timer(const Duration(seconds: 2), (){
         QuestionController.to.answerCorrect.value = false;

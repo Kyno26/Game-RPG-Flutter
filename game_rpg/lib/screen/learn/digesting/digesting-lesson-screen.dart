@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:game_rpg/component/ui-components/color.dart';
 import 'package:game_rpg/component/ui-components/spacing.dart';
 import 'package:game_rpg/component/ui-components/text-size.dart';
+import 'package:game_rpg/getx/battlefield-controller.dart';
 import 'package:game_rpg/screen/learn/digesting/about-digesting-page.dart';
 import 'package:game_rpg/screen/learn/digesting/digesting-disease-page.dart';
 import 'package:game_rpg/screen/learn/digesting/digesting-organs-page.dart';
@@ -92,7 +93,7 @@ class _DigestingLessonScreenState extends State<DigestingLessonScreen> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
+                    width: (BattleFieldController.to.inGame.value) ? MediaQuery.of(context).size.width * 0.85 : MediaQuery.of(context).size.width * 0.7,
                     child: Center(
                       child: Text('Sistem Pencernaan',
                         style: Theme.of(context)
@@ -107,6 +108,7 @@ class _DigestingLessonScreenState extends State<DigestingLessonScreen> {
                       ),
                     ),
                   ),
+                  if(!BattleFieldController.to.inGame.value)
                   GestureDetector(
                     onTap: () {
                       Navigator.popUntil(context, ModalRoute.withName('mainMenuScreen'));

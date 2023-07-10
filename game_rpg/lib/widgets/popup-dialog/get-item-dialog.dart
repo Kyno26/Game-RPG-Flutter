@@ -66,10 +66,19 @@ class _GetItemDialogState extends State<GetItemDialog> {
                 child: Obx(() => ElevatedButton(
                   onPressed: () {
                     if(CharacterController.to.selectedItemID.value != ''){
-                      if(ItemController.to.lifeNecklaceOn.value == true){
-                        setState(() {
-                          failGetItem = false;
-                        });
+                      print(CharacterController.to.selectedItemID.value);
+                      print('get item');
+                      if(CharacterController.to.selectedItemID.value != '9'){
+                        if(ItemController.to.lifeNecklaceOn.value == true){
+                          setState(() {
+                            failGetItem = false;
+                          });
+                          print('fail');
+                        }else{
+                          ItemController.to.addItem(itemID: int.parse(CharacterController.to.selectedItemID.value));
+                          Navigator.pop(context);
+                          ItemController.to.generateItem();
+                        }
                       }else{
                         ItemController.to.addItem(itemID: int.parse(CharacterController.to.selectedItemID.value));
                         Navigator.pop(context);

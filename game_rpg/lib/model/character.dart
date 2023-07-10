@@ -12,6 +12,7 @@ class Character {
   late final String imageUnlocked;    
   late final String imageLocked;
   late final String imageFull;
+  late final String attackEffect;
 
   Character.empty();
 
@@ -29,6 +30,7 @@ class Character {
     required this.imageUnlocked,
     required this.imageLocked,
     required this.imageFull,
+    required this.attackEffect,
   });
 
   factory Character.fromMap(Map<String, dynamic> json){
@@ -45,7 +47,8 @@ class Character {
       skillDesc: json['skill_desc'],
       imageUnlocked: json['image_unlocked'],
       imageLocked: json['image_locked'],
-      imageFull: json['image_full']
+      imageFull: json['image_full'],
+      attackEffect: json['attack_effect']
     );
   }
 
@@ -63,5 +66,6 @@ class Character {
     'image_unlocked': imageUnlocked,
     'image_locked': imageLocked,
     'image_full': imageFull,
+    'attack_effect': attackEffect
   };
 }

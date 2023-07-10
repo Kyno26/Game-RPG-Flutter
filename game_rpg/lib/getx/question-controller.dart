@@ -27,8 +27,8 @@ class QuestionController extends GetxController{
   RxString animation = ''.obs;
   RxBool showAnimation = false.obs;
 
-  RxInt maxTime = 15.obs;
-  RxInt curTime = 15.obs;
+  RxInt maxTime = 20.obs;
+  RxInt curTime = 20.obs;
 
   RxInt currentScore = 0.obs;
   RxBool newScore = false.obs;
@@ -45,8 +45,8 @@ class QuestionController extends GetxController{
     selectedAnswer.value = '';
     showAnswer.value = false;
     showAnimation.value = false;
-    maxTime.value = 15;
-    curTime.value = 15;
+    maxTime.value = 20;
+    curTime.value = 20;
   }
 
   getQuestionFromDatabase() async {
@@ -119,7 +119,7 @@ class QuestionController extends GetxController{
     await getQuestionFromDatabase();
     BattleFieldController.to.turnIcon.value = 'assets/icons/player-turn-icon.svg';
     BattleFieldController.to.questionPhase.value = true;
-    BattleFieldController.to.turn.value = 'player';
+    BattleFieldController.to.turn.value = 'Pemain';
     showDialog(
       barrierDismissible: false,
       context: context, 
@@ -175,7 +175,6 @@ class QuestionController extends GetxController{
     showAnimation.value = true;
 
     BattleFieldController.to.questionPhase.value = false;
-    // clearQuestionValue();
     Timer(const Duration(seconds: 1), (){
       showAnimation.value = false;
     });
